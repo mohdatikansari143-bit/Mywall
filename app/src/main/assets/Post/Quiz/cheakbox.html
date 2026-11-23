@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Create post</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background-color: #000000;
+      min-height: 100vh;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0 18px 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f1f1;
+    }
+
+    .post-btn {
+      background-color: #525252;
+      color: #0f0f0f;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: not-allowed;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .post-btn.active {
+      background-color: #ffffff;
+      color: #000000;
+      cursor: pointer;
+    }
+
+    /* Profile Section */
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: #0d0d0d;
+      border: 1px solid #1f1f1f;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .username {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .public-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #0d0d0d; /* Dark Black Background */
+      color: #15803d;            /* Dark Green Text & Icon */
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    /* Question Input */
+    .question-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 700;
+      resize: none;
+      margin-bottom: 14px;
+      line-height: 1.4;
+      min-height: 28px;
+    }
+
+    .question-input::placeholder {
+      color: #8e8e8e;
+      font-weight: 700;
+    }
+
+    /* Options List */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      border: 1px solid #242424;
+      border-radius: 12px;
+      padding: 6px 10px 6px 6px;
+      gap: 8px;
+      background-color: #000000;
+    }
+
+    .option-input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #0a0a0a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      min-height: 44px;
+    }
+
+    .option-preview {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    .option-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .option-input::placeholder {
+      color: #8e8e8e;
+      font-weight: 700;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+
+    .icon-btn:active {
+      background-color: #161616;
+    }
+
+    /* Add Option Button */
+    .add-option-btn {
+      width: 100%;
+      background-color: #0e0e0e;
+      color: #ffffff;
+      border: 1px solid #1c1c1c;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, background-color 0.2s;
+    }
+
+    .add-option-btn:active:not(:disabled) {
+      background-color: #171717;
+    }
+
+    .add-option-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .hidden-file-input {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <div class="header">
+      <div class="header-left">
+        <button class="close-btn" id="closeBtn" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <span class="header-title">Create post</span>
+      </div>
+      <button class="post-btn" id="postBtn">Post</button>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile-section">
+      <img
+        class="avatar"
+        src="https://api.dicebear.com/9.x/adventurer/svg?seed=Suho&backgroundColor=1e1b4b"
+        alt="Suho"
+      />
+      <div class="profile-info">
+        <span class="username">Suho</span>
+        <div class="public-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span>Public</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Input -->
+    <textarea
+      class="question-input"
+      id="questionInput"
+      rows="1"
+      placeholder="Ask Question"
+    ></textarea>
+
+    <!-- Options Container -->
+    <div class="options-list" id="optionsList"></div>
+
+    <!-- Add Option Button -->
+    <button class="add-option-btn" id="addOptionBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <span>Add option</span>
+    </button>
+  </div>
+
+  <script>
+    const MAX_OPTIONS = 5;
+    const optionsList = document.getElementById("optionsList");
+    const addOptionBtn = document.getElementById("addOptionBtn");
+    const questionInput = document.getElementById("questionInput");
+    const postBtn = document.getElementById("postBtn");
+
+    // Initial 2 options
+    let optionsData = [
+      { text: "", image: null },
+      { text: "", image: null }
+    ];
+
+    // Auto-resize question textarea
+    questionInput.addEventListener("input", () => {
+      questionInput.style.height = "auto";
+      questionInput.style.height = questionInput.scrollHeight + "px";
+      updatePostButton();
+    });
+
+    function updatePostButton() {
+      const hasQuestion = questionInput.value.trim().length > 0;
+      const hasAnyOption = optionsData.some(
+        opt => opt.text.trim().length > 0 || opt.image !== null
+      );
+
+      if (hasQuestion || hasAnyOption) {
+        postBtn.classList.add("active");
+      } else {
+        postBtn.classList.remove("active");
+      }
+    }
+
+    function renderOptions() {
+      optionsList.innerHTML = "";
+
+      optionsData.forEach((opt, index) => {
+        const row = document.createElement("div");
+        row.className = "option-row";
+
+        const inputWrap = document.createElement("div");
+        inputWrap.className = "option-input-wrap";
+
+        const imgPreview = document.createElement("img");
+        imgPreview.className = "option-preview";
+        if (opt.image) {
+          imgPreview.src = opt.image;
+          imgPreview.style.display = "block";
+        }
+
+        const textInput = document.createElement("input");
+        textInput.type = "text";
+        textInput.className = "option-input";
+        textInput.placeholder = `Option ${index + 1}`;
+        textInput.value = opt.text;
+        textInput.addEventListener("input", (e) => {
+          optionsData[index].text = e.target.value;
+          updatePostButton();
+        });
+
+        inputWrap.appendChild(imgPreview);
+        inputWrap.appendChild(textInput);
+
+        // Hidden file input for image upload
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+        fileInput.className = "hidden-file-input";
+        fileInput.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              optionsData[index].image = event.target.result;
+              renderOptions();
+              updatePostButton();
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // Image button
+        const imgBtn = document.createElement("button");
+        imgBtn.className = "icon-btn";
+        imgBtn.type = "button";
+        imgBtn.setAttribute("aria-label", "Add image");
+        imgBtn.innerHTML = `
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        `;
+        imgBtn.addEventListener("click", () => fileInput.click());
+
+        // Delete button
+        const delBtn = document.createElement("button");
+        delBtn.className = "icon-btn";
+        delBtn.type = "button";
+        delBtn.setAttribute("aria-label", "Delete option");
+        delBtn.innerHTML = `
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+            <path d="M10 11v6"></path>
+            <path d="M14 11v6"></path>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+          </svg>
+        `;
+        delBtn.addEventListener("click", () => {
+          optionsData.splice(index, 1);
+          renderOptions();
+          updatePostButton();
+        });
+
+        row.appendChild(inputWrap);
+        row.appendChild(fileInput);
+        row.appendChild(imgBtn);
+        row.appendChild(delBtn);
+
+        optionsList.appendChild(row);
+      });
+
+      // Limit strictly to 5 options
+      addOptionBtn.disabled = optionsData.length >= MAX_OPTIONS;
+    }
+
+    addOptionBtn.addEventListener("click", () => {
+      if (optionsData.length < MAX_OPTIONS) {
+        optionsData.push({ text: "", image: null });
+        renderOptions();
+        updatePostButton();
+      }
+    });
+
+    postBtn.addEventListener("click", () => {
+      if (postBtn.classList.contains("active")) {
+        alert("Post created!");
+      }
+    });
+
+    renderOptions();
+  </script>
+</body>
+</html>

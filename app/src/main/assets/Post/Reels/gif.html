@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>GIFs</title>
+
+<style>
+:root{
+ --bg:#000;
+ --panel:#121212;
+ --line:rgba(255,255,255,.09);
+ --muted:#8a8a90;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{
+ color:#fff;min-height:100vh;
+ font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Arial,sans-serif;
+ -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- Header ---------- */
+header{
+ position:sticky;top:0;z-index:20;
+ padding:calc(10px + env(safe-area-inset-top)) 12px 10px;
+ background:#000;
+ border-bottom:1px solid rgba(255,255,255,.05);
+}
+.wrap{max-width:1100px;margin:0 auto}
+.row{display:flex;align-items:center;gap:10px}
+
+/* --- BACK BUTTON (Solid Dark & Bold) --- */
+.back{
+ width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;
+ background:#121212;
+ border:1px solid rgba(255,255,255,0.12);
+ transition:transform .15s ease, background .2s ease, border-color .2s ease;
+}
+.back:active{
+ transform:scale(0.94);
+ background:#1e1e20;
+ border-color:rgba(255,255,255,0.22);
+}
+.back svg{width:20px;height:20px;color:#fff;stroke-width:2.8}
+
+/* --- SEARCH BAR (Slim + White Strip Border) --- */
+.search{
+ flex:1;min-width:0;height:38px;display:flex;align-items:center;gap:8px;
+ padding:0 6px 0 14px;border-radius:9999px;
+ background:var(--panel);border:1.5px solid #ffffff;
+}
+.search:focus-within{border-color:#ffffff}
+.search svg{color:var(--muted);width:18px;height:18px}
+.search input{
+ flex:1;min-width:0;background:transparent;border:0;outline:0;
+ color:#fff;font-size:16px;font-weight:500;
+}
+.search input::placeholder{color:var(--muted)}
+.search input::-webkit-search-cancel-button{display:none}
+#clearBtn{
+ width:26px;height:26px;border-radius:50%;display:none;place-items:center;background:#262626;
+}
+#clearBtn.show{display:grid}
+#clearBtn svg{width:13px;height:13px}
+
+/* --- TABS --- */
+.tabs{display:flex;gap:10px;margin-top:12px}
+.tab{
+ flex:1;height:44px;border-radius:9999px;font-size:14px;font-weight:800;letter-spacing:1px;
+ text-transform:uppercase;color:rgba(255,255,255,.45);
+ background:transparent;border:2px solid rgba(255,255,255,.18);
+ transition:border-color .2s, color .2s, background .2s;
+}
+.tab:active{opacity:.85}
+.tab.active{
+ background:rgba(255,255,255,.06);color:#fff;border-color:#ffffff;
+}
+
+.recent{display:none;margin-top:10px}
+.recent.show{display:block}
+.recent-head{display:flex;justify-content:space-between;margin-bottom:8px}
+.recent-head span{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
+.recent-head button{font-size:12px;color:var(--muted)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+ flex:none;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;
+ background:var(--panel);border:1px solid var(--line);
+}
+
+/* ---------- Content ---------- */
+main{padding:6px 4px calc(36px + env(safe-area-inset-bottom))}
+.heading{font-size:16px;font-weight:800;padding:10px 6px;word-break:break-word}
+.heading:empty{display:none}
+
+.masonry{display:flex;gap:4px;align-items:flex-start}
+.col{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+
+.card{
+ width:100%;overflow:hidden;border-radius:12px;background:var(--panel);cursor:pointer;
+ contain:layout paint;
+}
+.card:active{opacity:.8}
+.card img{width:100%;height:100%;display:block;object-fit:cover;opacity:0;transition:opacity .3s}
+.card img.ready{opacity:1}
+.stickers .card img{object-fit:contain;padding:8px}
+
+.sk{width:100%;border-radius:12px;background:var(--panel);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45}}
+
+/* ---------- States ---------- */
+.state{text-align:center;padding:70px 24px;color:var(--muted)}
+.orb{
+ width:68px;height:68px;margin:0 auto 16px;border-radius:22px;display:grid;place-items:center;
+ background:var(--panel);border:1px solid var(--line);
+}
+.orb svg{width:28px;height:28px;color:#fff}
+.state h3{color:#fff;font-size:18px;margin-bottom:6px}
+.state p{font-size:14px;line-height:1.5}
+.state button{margin-top:18px;padding:12px 26px;border-radius:14px;background:#fff;color:#000;font-weight:700}
+#sentinel{height:1px}
+#end{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 4px}
+.credit{text-align:center;padding:16px;color:#5f5f64;font-size:12px}
+.credit a{color:#8a8a90;text-decoration:none}
+
+/* ---------- Preview ---------- */
+.modal{
+ position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;
+ background:#000;
+}
+.modal.show{display:flex}
+.m-top{width:100%;display:flex;justify-content:flex-end;padding:calc(10px + env(safe-area-inset-top)) 12px 0}
+.m-top button{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--panel)}
+.stage{flex:1;width:100%;min-height:0;display:grid;place-items:center;padding:14px}
+.stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:16px}
+.m-bar{display:flex;gap:10px;width:100%;max-width:440px;padding:0 16px calc(18px + env(safe-area-inset-bottom))}
+.pill{
+ flex:1;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:8px;
+ font-weight:700;font-size:15px;background:var(--panel);border:1px solid var(--line);
+}
+.pill.primary{background:#fff;color:#000;border-color:#fff}
+.pill:active{opacity:.8}
+
+.toast{
+ position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));z-index:60;
+ transform:translateX(-50%);opacity:0;pointer-events:none;
+ padding:10px 18px;border-radius:14px;font-size:13px;font-weight:600;
+ background:#1c1c1c;border:1px solid var(--line);transition:opacity .25s;
+}
+.toast.show{opacity:1}
+
+@media(min-width:700px){
+ header,main{padding-left:20px;padding-right:20px}
+ .masonry,.col{gap:8px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="wrap">
+  <div class="row">
+   <button class="back" id="backBtn" aria-label="Back">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+   </button>
+   <form class="search" id="searchForm" autocomplete="off">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="searchInput" type="search" maxlength="50" placeholder="Search for GIFs" enterkeyhint="search">
+    <button type="button" id="clearBtn" aria-label="Clear">
+     <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+   </form>
+  </div>
+
+  <div class="recent" id="recent">
+   <div class="recent-head"><span>Recent</span><button type="button" id="clearHistory">Clear</button></div>
+   <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="tabs">
+   <button class="tab active" data-type="gifs">GIFs</button>
+   <button class="tab" data-type="stickers">Stickers</button>
+  </div>
+ </div>
+</header>
+
+<main>
+ <div class="wrap">
+  <div class="heading" id="heading"></div>
+  <div class="masonry" id="gallery"></div>
+  <div id="stateBox"></div>
+  <div id="sentinel"></div>
+  <div id="end" hidden>You've reached the end</div>
+  <div class="credit">Powered by <a href="https://giphy.com" target="_blank" rel="noopener">GIPHY</a></div>
+ </div>
+</main>
+
+<!-- Full-screen preview -->
+<div class="modal" id="modal">
+ <div class="m-top">
+  <button id="closeModal" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+ </div>
+ <div class="stage"><img id="preview" alt=""></div>
+ <div class="m-bar">
+  <button class="pill primary" id="dlBtn">Download</button>
+  <button class="pill" id="shareBtn">Share</button>
+ </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================================
+// GIPHY API CONFIGURATION (unchanged)
+// ===================================
+const API_KEY = "MVQEatZfNsOk9sIyYe8eGDfNczd1UOkO";
+const LIMIT = 24;
+
+const $ = id => document.getElementById(id);
+const gallery = $("gallery"), stateBox = $("stateBox"), heading = $("heading");
+const searchInput = $("searchInput"), clearBtn = $("clearBtn");
+const sentinel = $("sentinel"), endMsg = $("end");
+const modal = $("modal"), preview = $("preview");
+
+let type = "gifs";
+let query = "";
+let offset = 0;
+let loading = false;
+let finished = false;
+let requestNumber = 0;
+let current = null;
+
+let items = [];
+let columns = [], heights = [], skeletons = [];
+
+// ---------- safe storage (recent searches) ----------
+const store = {
+ get(k, d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch(e){ return d; } },
+ set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let searchHistory = store.get("gg_history", []);
+
+// ===================================
+// CREATE API URL (same endpoints + params)
+// ===================================
+function createURL(){
+ const endpoint = query
+  ? `https://api.giphy.com/v1/${type}/search`
+  : `https://api.giphy.com/v1/${type}/trending`;
+
+ const url = new URL(endpoint);
+ url.searchParams.set("api_key", API_KEY);
+ url.searchParams.set("limit", String(LIMIT));
+ url.searchParams.set("offset", offset);
+ url.searchParams.set("rating", "g");
+ url.searchParams.set("lang", "en");
+ if(query) url.searchParams.set("q", query);
+ return url.toString();
+}
+
+// ---------- helpers ----------
+const ICON_SEARCH = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+const ICON_WARN = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 17h.01"/></svg>';
+
+function toast(msg){
+ const t = $("toast");
+ t.textContent = msg;
+ t.classList.add("show");
+ clearTimeout(toast.t);
+ toast.t = setTimeout(() => t.classList.remove("show"), 1700);
+}
+
+function normalize(item){
+ const im = item.images || {};
+ const fw = im.fixed_width || {};
+ const display = fw.webp || fw.url || im.original?.webp || im.original?.url;
+ const original = im.original?.url || fw.url;
+ if(!display || !original) return null;
+ const big = im.downsized_large?.url || im.downsized?.url || original;
+ const w = parseInt(fw.width) || parseInt(im.original?.width) || 1;
+ const h = parseInt(fw.height) || parseInt(im.original?.height) || 1;
+ return { id:item.id, title:item.title || "GIF", display, original, big, w, h };
+}
+
+function setHeading(){
+ heading.textContent = query || "";
+ gallery.className = "masonry " + type;
+}
+
+// ===================================
+// MASONRY
+// ===================================
+const colCount = () => window.innerWidth >= 700 ? 4 : 2;
+
+function buildColumns(){
+ gallery.innerHTML = "";
+ columns = []; heights = []; skeletons = [];
+ for(let i = 0; i < colCount(); i++){
+  const c = document.createElement("div");
+  c.className = "col";
+  gallery.appendChild(c);
+  columns.push(c);
+  heights.push(0);
+ }
+}
+
+function place(el, ratio){
+ const idx = heights.indexOf(Math.min(...heights));
+ columns[idx].appendChild(el);
+ heights[idx] += ratio;
+ return idx;
+}
+
+function showSkeletons(n){
+ const ratios = [1.1, .8, 1.3, .95, 1.2, .85, 1, 1.25];
+ for(let i = 0; i < n; i++){
+  const r = ratios[i % ratios.length];
+  const s = document.createElement("div");
+  s.className = "sk";
+  s.style.aspectRatio = `1 / ${r}`;
+  skeletons.push({ el:s, idx:place(s, r), r });
+ }
+}
+function clearSkeletons(){
+ skeletons.forEach(s => { s.el.remove(); heights[s.idx] -= s.r; });
+ skeletons = [];
+}
+
+function addCard(item){
+ const card = document.createElement("div");
+ card.className = "card";
+ card.style.aspectRatio = `${item.w} / ${item.h}`;
+
+ const img = document.createElement("img");
+ img.alt = item.title;
+ img.loading = "lazy";
+ img.decoding = "async";
+ img.onload = () => img.classList.add("ready");
+ img.onerror = () => card.remove();
+ img.src = item.display;
+
+ card.appendChild(img);
+ card.onclick = () => openPreview(item);
+ place(card, item.h / item.w);
+}
+
+let lastCols = colCount();
+let resizeTimer;
+window.addEventListener("resize", () => {
+ clearTimeout(resizeTimer);
+ resizeTimer = setTimeout(() => {
+  if(colCount() === lastCols) return;
+  lastCols = colCount();
+  buildColumns();
+  items.forEach(addCard);
+ }, 200);
+});
+
+// ---------- states ----------
+function showState(icon, title, text, retry){
+ stateBox.innerHTML = "";
+ const box = document.createElement("div");
+ box.className = "state";
+ box.innerHTML = `<div class="orb">${icon}</div><h3></h3><p></p>`;
+ box.querySelector("h3").textContent = title;
+ box.querySelector("p").textContent = text;
+ if(retry){
+  const b = document.createElement("button");
+  b.textContent = "Try again";
+  b.onclick = retry;
+  box.appendChild(b);
+ }
+ stateBox.appendChild(box);
+}
+const clearState = () => { stateBox.innerHTML = ""; };
+
+// ===================================
+// LOAD CONTENT (infinite scroll)
+// ===================================
+async function loadContent(reset = true){
+ if(loading && !reset) return;
+
+ const thisRequest = ++requestNumber;
+
+ if(reset){
+  offset = 0;
+  finished = false;
+  items = [];
+  buildColumns();
+  endMsg.hidden = true;
+  clearState();
+  setHeading();
+ }
+ if(finished) return;
+
+ loading = true;
+ showSkeletons(reset ? 8 : 4);
+
+ try{
+  const response = await fetch(createURL());
+  const result = await response.json();
+  if(thisRequest !== requestNumber) return;
+
+  if(!response.ok){
+   const code = result.meta?.status || response.status;
+   const message = result.meta?.msg || "API request failed";
+   throw new Error(`GIPHY Error ${code}: ${message}`);
+  }
+
+  clearSkeletons();
+
+  if(!Array.isArray(result.data) || result.data.length === 0){
+   finished = true;
+   if(offset === 0){
+    showState(ICON_SEARCH, "No results found",
+     query ? `Nothing matched "${query}". Try a different word.` : "Nothing to show right now.");
+   }else{
+    endMsg.hidden = false;
+   }
+   return;
+  }
+
+  const frag = [];
+  result.data.forEach(raw => {
+   const item = normalize(raw);
+   if(item){ items.push(item); frag.push(item); }
+  });
+  frag.forEach(addCard);
+
+  offset += result.data.length;
+  if(result.data.length < LIMIT){ finished = true; endMsg.hidden = false; }
+  if(!items.length) showState(ICON_WARN, "No usable images", "GIPHY returned items without previews.");
+
+ }catch(error){
+  console.error(error);
+  if(thisRequest !== requestNumber) return;
+  clearSkeletons();
+  showState(ICON_WARN, "Something went wrong",
+   error.message === "Failed to fetch" ? "Check your internet connection and try again." : error.message,
+   () => { clearState(); loadContent(offset === 0); });
+ }finally{
+  if(thisRequest === requestNumber) loading = false;
+ }
+}
+
+new IntersectionObserver(entries => {
+ if(entries[0].isIntersecting && !loading && !finished && items.length){
+  loadContent(false);
+ }
+}, { rootMargin: "600px" }).observe(sentinel);
+
+// ===================================
+// SEARCH + RECENT
+// ===================================
+function renderHistory(){
+ const box = $("chips");
+ box.innerHTML = "";
+ searchHistory.forEach(term => {
+  const c = document.createElement("button");
+  c.type = "button";
+  c.className = "chip";
+  c.textContent = term;
+  c.onmousedown = e => e.preventDefault();
+  c.onclick = () => { searchInput.value = term; runSearch(); };
+  box.appendChild(c);
+ });
+ updateRecent();
+}
+
+function updateRecent(){
+ const show = document.activeElement === searchInput && !searchInput.value && searchHistory.length;
+ $("recent").classList.toggle("show", !!show);
+}
+
+function saveHistory(term){
+ searchHistory = [term, ...searchHistory.filter(h => h.toLowerCase() !== term.toLowerCase())].slice(0, 8);
+ store.set("gg_history", searchHistory);
+ renderHistory();
+}
+
+$("clearHistory").onmousedown = e => e.preventDefault();
+$("clearHistory").onclick = () => {
+ searchHistory = [];
+ store.set("gg_history", searchHistory);
+ renderHistory();
+};
+
+searchInput.addEventListener("focus", updateRecent);
+searchInput.addEventListener("blur", () => setTimeout(updateRecent, 120));
+searchInput.addEventListener("input", () => {
+ clearBtn.classList.toggle("show", !!searchInput.value);
+ updateRecent();
+});
+
+function runSearch(){
+ query = searchInput.value.trim();
+ if(query.length > 50){ toast("Search must be 50 characters or less"); return; }
+ if(query) saveHistory(query);
+ clearBtn.classList.toggle("show", !!searchInput.value);
+ searchInput.blur();
+ window.scrollTo({ top: 0 });
+ loadContent(true);
+}
+
+$("searchForm").addEventListener("submit", e => { e.preventDefault(); runSearch(); });
+
+clearBtn.onclick = () => {
+ searchInput.value = "";
+ clearBtn.classList.remove("show");
+ const had = !!query;
+ query = "";
+ searchInput.focus();
+ if(had) loadContent(true);
+};
+
+// ===================================
+// TABS + SWIPE NAVIGATION
+// ===================================
+function switchTab(nextType){
+ if(type === nextType) return;
+ type = nextType;
+ document.querySelectorAll(".tab").forEach(b => {
+  b.classList.toggle("active", b.dataset.type === nextType);
+ });
+ searchInput.placeholder = type === "gifs" ? "Search for GIFs" : "Search for Stickers";
+ window.scrollTo({ top: 0 });
+ loadContent(true);
+}
+
+document.querySelectorAll(".tab").forEach(button => {
+ button.addEventListener("click", () => switchTab(button.dataset.type));
+});
+
+let touchStartX = 0, touchStartY = 0, touchStartTime = 0, swipeValid = false;
+
+document.addEventListener("touchstart", e => {
+ if(e.touches.length !== 1 || modal.classList.contains("show") || e.target.closest(".chips")){
+  swipeValid = false;
+  return;
+ }
+ swipeValid = true;
+ touchStartX = e.touches[0].clientX;
+ touchStartY = e.touches[0].clientY;
+ touchStartTime = Date.now();
+}, { passive: true });
+
+document.addEventListener("touchend", e => {
+ if(!swipeValid || e.changedTouches.length !== 1) return;
+ swipeValid = false;
+ const dx = e.changedTouches[0].clientX - touchStartX;
+ const dy = e.changedTouches[0].clientY - touchStartY;
+ const dt = Date.now() - touchStartTime;
+
+ if(dt < 600 && Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.5){
+  if(dx < 0 && type === "gifs") switchTab("stickers");
+  else if(dx > 0 && type === "stickers") switchTab("gifs");
+ }
+}, { passive: true });
+
+// ===================================
+// PREVIEW (full screen)
+// ===================================
+function openPreview(item){
+ current = item;
+ preview.src = item.big;
+ preview.alt = item.title;
+ modal.classList.add("show");
+ document.body.style.overflow = "hidden";
+}
+
+function closePreview(){
+ if(!modal.classList.contains("show")) return;
+ modal.classList.remove("show");
+ document.body.style.overflow = "";
+ preview.src = "";
+}
+
+$("closeModal").onclick = closePreview;
+document.addEventListener("keydown", e => { if(e.key === "Escape") closePreview(); });
+modal.addEventListener("click", e => {
+ if(e.target === modal || e.target.classList.contains("stage")) closePreview();
+});
+
+$("dlBtn").onclick = () => current && download(current);
+
+$("shareBtn").onclick = async () => {
+ if(!current) return;
+ try{
+  if(navigator.share){
+   await navigator.share({ title: current.title, url: current.original });
+  }else{
+   await navigator.clipboard.writeText(current.original);
+   toast("Link copied");
+  }
+ }catch(e){}
+};
+
+async function download(item){
+ const ext = item.original.split("?")[0].split(".").pop() || "gif";
+ const name = (item.title || "giphy").replace(/[^\w\-]+/g, "_").slice(0, 40) + "." + ext;
+ try{
+  toast("Downloading...");
+  const res = await fetch(item.original);
+  if(!res.ok) throw new Error("download failed");
+  const blob = await res.blob();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast("Saved");
+ }catch(e){
+  window.open(item.original, "_blank", "noopener");
+ }
+}
+
+// ---------- back + init ----------
+$("backBtn").onclick = () => {
+ if(modal.classList.contains("show")) closePreview();
+ else if(query){
+  searchInput.value = ""; clearBtn.classList.remove("show");
+  query = ""; loadContent(true);
+ }
+ else if(window.history.length > 1) window.history.back();
+ else window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+renderHistory();
+loadContent(true);
+</script>
+</body>
+</html>

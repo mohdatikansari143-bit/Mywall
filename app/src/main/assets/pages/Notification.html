@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Notifications</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================
+       SCROLLBAR COMPLETELY HIDDEN
+       ========================================== */
+    ::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+      background: transparent !important;
+    }
+
+    /* Full Jet Black Reset - ALL BOLD TYPOGRAPHY */
+    html, body {
+      background-color: #000000 !important;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden; /* Body scroll band */
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', Roboto, sans-serif;
+      font-weight: 800;
+      overscroll-behavior-y: none;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      font-family: inherit;
+      font-weight: 800;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      background: #000000;
+    }
+
+    /* Fixed Screen Wrapper (Locks Header and Viewport) */
+    .app-screen {
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: #000000;
+      padding: 16px 18px 0 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ==========================================
+       FIXED TOP BAR (CHIPKA RAHEGA)
+       ========================================== */
+    .top-nav-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-shrink: 0; /* Kahi nahi hilega */
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Liquid Dark Glass Back Button */
+    .glass-back-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.6),
+        0 8px 24px rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+      color: #ffffff;
+      outline: none;
+      padding: 0;
+    }
+
+    .glass-back-btn:active {
+      transform: scale(0.92);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%);
+    }
+
+    .glass-back-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.8;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .page-title {
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    /* ==========================================
+       FIXED LINE TABS BAR (CHIPKA RAHEGA)
+       ========================================== */
+    .line-tabs-bar {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      flex-shrink: 0; /* Kahi nahi hilega */
+    }
+
+    .line-tab-btn {
+      flex: 1;
+      padding: 13px 0 14px 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-weight: 800;
+      color: #71717a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+      transition: color 0.22s ease;
+      letter-spacing: -0.2px;
+    }
+
+    .line-tab-btn:active {
+      opacity: 0.7;
+    }
+
+    .line-tab-btn.active {
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    .line-tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 58px;
+      height: 3.5px;
+      background: #ffffff;
+      border-radius: 99px;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+    }
+
+    /* ==========================================
+       SWIPE SLIDER VIEWPORT (FLEX CONTAINER)
+       ========================================== */
+    .slider-viewport {
+      width: 100%;
+      flex: 1;
+      min-height: 0; /* Flexbox overflow scroll ke liye zaroori */
+      overflow: hidden;
+      position: relative;
+      touch-action: pan-y;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    .slider-track {
+      display: flex;
+      width: 300%;
+      height: 100%;
+      transform: translateX(0%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+      will-change: transform;
+    }
+
+    /* ANDAR KA SCROLL YAHAN SE HOGA */
+    .slide-page {
+      width: 33.333333%;
+      height: 100%;
+      overflow-y: auto; /* Internal Smooth Scroll */
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: 14px; /* Tabs aur Today ke beech spacing */
+      padding-bottom: 40px; /* Bottom padding */
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    /* ==========================================
+       SECTION HEADERS
+       ========================================== */
+    .section-label {
+      font-size: 19px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.4px;
+      margin: 18px 0 12px 0;
+    }
+
+    .section-label:first-of-type {
+      margin-top: 0;
+    }
+
+    /* ==========================================
+       NOTIFICATION ITEMS (NO BOXES / BOLD FONT)
+       ========================================== */
+    .notification-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notif-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 2px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.18s ease, transform 0.25s ease, opacity 0.25s ease;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .notif-item:active {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .notif-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Avatar & Sub-Badge */
+    .notif-avatar-box {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+    }
+
+    .notif-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #181922;
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: #ffffff;
+    }
+
+    .notif-sub-icon {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #000000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .notif-sub-icon svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* Badge Types */
+    .badge-member  { background: #10b981; fill: #ffffff; }
+    .badge-token   { background: #ffffff; fill: #000000; }
+    .badge-verify  { background: #0ea5e9; fill: #ffffff; }
+    .badge-bell    { background: #ec4899; fill: #ffffff; }
+    .badge-comment { background: #8b5cf6; fill: #ffffff; }
+
+    /* Content Area */
+    .notif-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-top: 1px;
+      min-width: 0;
+    }
+
+    .notif-text {
+      font-size: 14.5px;
+      line-height: 1.42;
+      font-weight: 800;
+      color: #e2e8f0;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .notif-text strong {
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .notif-time {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #71717a;
+      margin-left: 6px;
+      white-space: nowrap;
+    }
+
+    .notif-preview-box {
+      margin-top: 5px;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #94a3b8;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ==========================================
+       RIGHT ACTION AREA (Unread Dot + MOTI 3-DOT)
+       ========================================== */
+    .notif-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      padding-top: 2px;
+      position: relative;
+    }
+
+    /* Unread Indicator Glow Dot */
+    .unread-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 10px #38bdf8;
+      flex-shrink: 0;
+    }
+
+    .notif-item.read .unread-indicator {
+      display: none;
+    }
+
+    /* Moti / Bold 3-Dot Button */
+    .notif-more-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+    }
+
+    .notif-more-btn:active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(0.92);
+    }
+
+    .notif-more-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* ==========================================
+       DARK REFINED 3-DOT POPUP MENU
+       ========================================== */
+    .action-dropdown-menu {
+      position: absolute;
+      top: 38px;
+      right: 0;
+      min-width: 142px;
+      background: #090a0f;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      display: none;
+      flex-direction: column;
+      padding: 6px;
+      z-index: 100;
+    }
+
+    .action-dropdown-menu.show {
+      display: flex;
+      animation: menuPop 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes menuPop {
+      0% { opacity: 0; transform: scale(0.88) translateY(-6px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9.5px 12px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.15s ease;
+      width: 100%;
+      text-align: left;
+    }
+
+    .dropdown-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* Reply Button */
+    .dropdown-btn.reply-btn {
+      color: #ffffff;
+    }
+
+    .dropdown-btn.reply-btn:active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Divider between Reply and Delete */
+    .dropdown-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 4px 6px;
+    }
+
+    /* Delete Button */
+    .dropdown-btn.delete-btn {
+      color: #f87171;
+    }
+
+    .dropdown-btn.delete-btn:active {
+      background: rgba(239, 68, 68, 0.12);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-screen">
+
+    <!-- Fixed Top Navigation Bar -->
+    <div class="top-nav-bar">
+      <div class="nav-left">
+        <button class="glass-back-btn" onclick="history.back()" aria-label="Back">
+          <svg viewBox="0 0 24 24">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <h1 class="page-title">Notifications</h1>
+      </div>
+    </div>
+
+    <!-- Fixed Line Tabs Bar -->
+    <div class="line-tabs-bar" id="tabsBar">
+      <button class="line-tab-btn active" data-index="0">All</button>
+      <button class="line-tab-btn" data-index="1">Replies</button>
+      <button class="line-tab-btn" data-index="2">Mentions</button>
+    </div>
+
+    <!-- Swipe Viewport for Horizontal Sliding -->
+    <div class="slider-viewport" id="sliderViewport">
+      <div class="slider-track" id="sliderTrack">
+
+        <!-- ================= PAGE 0: ALL (INTERNAL SCROLL FROM TODAY) ================= -->
+        <div class="slide-page" id="pageAll">
+          <div class="section-label">Today</div>
+          <div class="notification-list">
+
+            <!-- Item 1: DJ Sessions -->
+            <div class="notif-item unread">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-member">
+                  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  You got approved to join <strong>DJ Sessions</strong> with <strong>Jyoty</strong> and <strong>HAVAI B.</strong>
+                  <span class="notif-time">4h ago</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <div class="unread-indicator"></div>
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 2: Trexwallet System -->
+            <div class="notif-item unread">
+              <div class="notif-avatar-box">
+                <div class="notif-avatar" style="background: #111218;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffffff"><path d="M4 4h16v3H13.5v13h-3V7H4V4z"/></svg>
+                </div>
+                <div class="notif-sub-icon badge-token">
+                  <svg viewBox="0 0 24 24"><path d="M4 4h16v3H13.5v13h-3V7H4V4z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Trexwallet System:</strong> Block Reward of <strong>+124.50 TR</strong> successfully credited to your main balance.
+                  <span class="notif-time">5h ago</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <div class="unread-indicator"></div>
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 3: Elena Rostova -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-verify">
+                  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Elena Rostova</strong> completed peer verification for your <strong>TR Staking Node</strong>.
+                  <span class="notif-time">6h ago</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 4: Sarah Mitchell -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-bell">
+                  <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Sarah Mitchell</strong> posted in <strong>Ai Founders + Builders Happy Hour</strong>.
+                  <span class="notif-time">7h ago</span>
+                </p>
+                <div class="notif-preview-box">
+                  It Was incredible to learn about the amazing startups being grown here in London, direct from founders themselv...
+                </div>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="section-label">This Week</div>
+          <div class="notification-list">
+
+            <!-- Item 5: Lucas Terry -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-member">
+                  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Lucas Terry</strong> registered for <strong>Board Games Night at Six Cafe</strong>.
+                  <span class="notif-time">4d ago</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 6: Chanel Green -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-comment">
+                  <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Chanel Green</strong> commented on your post: <strong>this is amazing!! 🔥</strong>
+                  <span class="notif-time">14 Aug</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= PAGE 1: REPLIES (INTERNAL SCROLL) ================= -->
+        <div class="slide-page" id="pageReplies">
+          <div class="section-label">Replies & Discussions</div>
+          <div class="notification-list">
+
+            <!-- Item: Sarah Mitchell -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-bell">
+                  <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Sarah Mitchell</strong> posted in <strong>Ai Founders + Builders Happy Hour</strong>.
+                  <span class="notif-time">7h ago</span>
+                </p>
+                <div class="notif-preview-box">
+                  It Was incredible to learn about the amazing startups being grown here in London, direct from founders themselv...
+                </div>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item: Chanel Green -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-comment">
+                  <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Chanel Green</strong> commented on your post: <strong>this is amazing!! 🔥</strong>
+                  <span class="notif-time">14 Aug</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= PAGE 2: MENTIONS (INTERNAL SCROLL) ================= -->
+        <div class="slide-page" id="pageMentions">
+          <div class="section-label">Mentions & Activities</div>
+          <div class="notification-list">
+
+            <!-- Item: DJ Sessions -->
+            <div class="notif-item unread">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-member">
+                  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  You got approved to join <strong>DJ Sessions</strong> with <strong>Jyoty</strong> and <strong>HAVAI B.</strong>
+                  <span class="notif-time">4h ago</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <div class="unread-indicator"></div>
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item: Elena Rostova -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-verify">
+                  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Elena Rostova</strong> completed peer verification for your <strong>TR Staking Node</strong>.
+                  <span class="notif-time">6h ago</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item: Lucas Terry -->
+            <div class="notif-item">
+              <div class="notif-avatar-box">
+                <img class="notif-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+                <div class="notif-sub-icon badge-member">
+                  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+              </div>
+              <div class="notif-content">
+                <p class="notif-text">
+                  <strong>Lucas Terry</strong> registered for <strong>Board Games Night at Six Cafe</strong>.
+                  <span class="notif-time">4d ago</span>
+                </p>
+              </div>
+              <div class="notif-right-actions">
+                <button class="notif-more-btn" aria-label="More options">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="20" r="3.2"></circle></svg>
+                </button>
+                <div class="action-dropdown-menu">
+                  <button class="dropdown-btn reply-btn">
+                    <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                    <span>Reply</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-btn delete-btn">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ==========================================
+    // SLIDE & GESTURE SWIPE CONTROLLER
+    // ==========================================
+    let currentTabIndex = 0;
+    const totalTabs = 3;
+    const sliderTrack = document.getElementById('sliderTrack');
+    const tabButtons = document.querySelectorAll('.line-tab-btn');
+    const sliderViewport = document.getElementById('sliderViewport');
+
+    function goToTab(index) {
+      if (index < 0 || index >= totalTabs) return;
+      currentTabIndex = index;
+
+      // Smooth horizontal slide
+      sliderTrack.style.transform = `translateX(-${currentTabIndex * (100 / totalTabs)}%)`;
+
+      // Update underline tab indicator
+      tabButtons.forEach((btn, idx) => {
+        if (idx === currentTabIndex) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Close open dropdown menus on tab switch
+      document.querySelectorAll('.action-dropdown-menu').forEach(m => m.classList.remove('show'));
+    }
+
+    // Tab buttons click to slide
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetIndex = parseInt(btn.getAttribute('data-index'), 10);
+        goToTab(targetIndex);
+      });
+    });
+
+    // Touch Swipe Detection (Left & Right Swipe)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+
+    sliderViewport.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.action-dropdown-menu') || e.target.closest('.notif-more-btn')) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isSwiping = true;
+    }, { passive: true });
+
+    sliderViewport.addEventListener('touchend', (e) => {
+      if (!isSwiping) return;
+      isSwiping = false;
+
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffX = touchStartX - touchEndX;
+      const diffY = touchStartY - touchEndY;
+
+      // Horizontal swipe dominant threshold
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 45) {
+        if (diffX > 0) {
+          goToTab(currentTabIndex + 1);
+        } else {
+          goToTab(currentTabIndex - 1);
+        }
+      }
+    }, { passive: true });
+
+    // Mark as read on row tap
+    document.querySelectorAll('.notif-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (!e.target.closest('.notif-right-actions')) {
+          item.classList.remove('unread');
+          item.classList.add('read');
+        }
+      });
+    });
+
+    // ==========================================
+    // 3-DOT MENU INTERACTIONS (Reply & Delete)
+    // ==========================================
+    document.addEventListener('click', (e) => {
+      const moreBtn = e.target.closest('.notif-more-btn');
+
+      if (moreBtn) {
+        e.stopPropagation();
+        const menu = moreBtn.nextElementSibling;
+        const isOpen = menu.classList.contains('show');
+
+        // Close all other menus
+        document.querySelectorAll('.action-dropdown-menu').forEach(m => m.classList.remove('show'));
+
+        if (!isOpen) {
+          menu.classList.add('show');
+        }
+      } else {
+        document.querySelectorAll('.action-dropdown-menu').forEach(m => m.classList.remove('show'));
+      }
+    });
+
+    // Reply button action
+    document.addEventListener('click', (e) => {
+      const replyBtn = e.target.closest('.reply-btn');
+      if (replyBtn) {
+        e.stopPropagation();
+        const notifRow = replyBtn.closest('.notif-item');
+        if (notifRow) {
+          notifRow.classList.remove('unread');
+          notifRow.classList.add('read');
+        }
+        replyBtn.closest('.action-dropdown-menu').classList.remove('show');
+      }
+    });
+
+    // Delete button action with animation
+    document.addEventListener('click', (e) => {
+      const deleteBtn = e.target.closest('.delete-btn');
+      if (deleteBtn) {
+        e.stopPropagation();
+        const notifRow = deleteBtn.closest('.notif-item');
+        if (notifRow) {
+          notifRow.style.transition = 'all 0.22s cubic-bezier(0.4, 0, 0.2, 1)';
+          notifRow.style.opacity = '0';
+          notifRow.style.transform = 'translateX(24px)';
+
+          setTimeout(() => {
+            notifRow.remove();
+          }, 220);
+        }
+      }
+    });
+  </script>
+
+</body>
+  </html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About Trex Wallet</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&display=swap">
+<style>
+:root {
+  --bg: #000000;
+  --fg: #ffffff;
+  --soft: #ececec;
+  --muted: #a3a3a3;
+  --line: #2b2b2b;
+  --panel: #0e0e0e;
+  --accent: #facc15;
+  --accent-ink: #000000;
+  --font: "Lato", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Courier New", Courier, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font);
+  font-weight: 700; font-size: 17px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 72px; overflow-x: hidden;
+}
+.wrap { width: 100%; max-width: 840px; margin: 0 auto; }
+.site-head { border-bottom: 1px solid var(--line); margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.site-head .wrap { display: flex; align-items: center; gap: 14px; min-height: 76px; }
+.site-head img, .site-head svg.logo { width: 44px; height: 44px; display: block; }
+.site-head span { font-weight: 900; font-size: 18px; letter-spacing: .14em; text-transform: uppercase; }
+.doc-label { margin: 56px 0 10px; font-size: 14px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-weight: 900; font-size: clamp(30px, 5.4vw, 46px); line-height: 1.15; letter-spacing: -.01em; text-wrap: balance; }
+.meta-subtitle { margin: 22px 0 0; padding-bottom: 22px; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.6; color: var(--muted); }
+h2, h3, h4 { font-weight: 900; color: var(--fg); text-wrap: balance; }
+h2 { font-size: clamp(22px, 3.2vw, 28px); line-height: 1.25; margin: 64px 0 20px; padding-top: 28px; border-top: 1px solid var(--line); }
+h3 { font-size: 19px; line-height: 1.3; margin: 32px 0 12px; }
+h2[id], .toc-title { scroll-margin-top: 16px; }
+.toc-title { border-top: 0; margin-top: 40px; padding-top: 0; }
+p { margin: 0 0 16px; color: var(--soft); text-wrap: pretty; }
+strong { color: var(--fg); font-weight: 900; }
+a { color: var(--fg); font-weight: 900; text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: var(--accent); }
+ul, ol { margin: 0 0 20px; padding-left: 22px; }
+li { margin-bottom: 8px; color: var(--soft); }
+mark { background: var(--accent); color: var(--accent-ink); padding: 1px 5px; border-radius: 2px; font-weight: 900; }
+.toc-list { list-style: none; padding: 0; margin: 0 0 8px; display: grid; grid-template-columns: minmax(0, 1fr); }
+.toc-list li { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.clause-text { padding-left: 16px; border-left: 2px solid var(--line); }
+.divider { border: 0; border-top: 1px solid var(--line); margin: 64px 0 24px; }
+.doc-footer { font-size: 14px; line-height: 1.7; color: var(--muted); }
+.doc-footer strong { color: var(--fg); }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+body { -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+img { max-width: 100%; }
+p, li, td, h1, h2, h3, h4 { overflow-wrap: anywhere; }
+.back-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%;
+  color: #fff; text-decoration: none; cursor: pointer;
+  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.04) 45%, rgba(255,255,255,.08));
+  -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.35), inset 0 -8px 16px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.6);
+  transition: transform .2s ease, background .2s ease; -webkit-tap-highlight-color: transparent;
+}
+.back-btn:hover { color: #fff; background: linear-gradient(145deg, rgba(255,255,255,.24), rgba(255,255,255,.06) 45%, rgba(255,255,255,.12)); }
+.back-btn:active { transform: scale(.92); }
+.back-btn svg { width: 22px; height: 22px; display: block; }
+
+.first-h2 { border-top: 0; margin-top: 40px; }
+.intro { margin: 28px 0 0; font-size: 19px; color: var(--soft); }
+.written-note { margin: 28px 0; padding: 18px 20px; background: var(--panel); border-left: 4px solid var(--accent); }
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap">
+    <a class="back-btn" href="#" aria-label="Back" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <span>Trex Wallet</span>
+  </div>
+</header>
+<main class="wrap">
+<p class="doc-label">Trex Wallet</p>
+<h1>About Us</h1>
+<div class="meta-subtitle"><strong>Based in:</strong> Thunder Bay, Ontario, Canada</div>
+<p class="intro">Trex Wallet is a professional digital asset wallet and exchange platform. Store your Trex Coin, convert it to USDT, and manage everything in one secure place.</p>
+
+<h2 class="first-h2">Who We Are</h2>
+<p>Trex Wallet is a digital asset infrastructure built to make holding and moving crypto simple, fast, and safe. We are registered in Thunder Bay, Ontario, Canada, and serve users through our mobile app, website, and APIs.</p>
+
+<h2>What We Do</h2>
+<ul>
+<li><strong>Wallet:</strong> Secure storage for Trex Coin, USDT, and other supported assets</li>
+<li><strong>Conversion:</strong> Real-time Trex Coin to USDT conversion</li>
+<li><strong>Exchange:</strong> Digital asset exchanges and trade settlement</li>
+<li><strong>Tracking:</strong> Live balances, transaction history, and market data</li>
+<li><strong>Support:</strong> Help with your account and transactions</li>
+</ul>
+
+<h2>Multi-Network USDT</h2>
+<p>Send and receive USDT on the network you prefer:</p>
+<ul>
+<li>ERC-20 (Ethereum)</li>
+<li>TRC-20 (TRON)</li>
+<li>BEP-20 (BNB Chain)</li>
+</ul>
+
+<h2>How We Protect Your Assets</h2>
+<ul>
+<li>Multi-party computation (MPC) and offline multisig cold storage</li>
+<li>1:1 reserve for all user-deposited digital assets</li>
+<li>AES-256 encryption at rest and TLS 1.3 in transit</li>
+<li>Multi-factor authentication and biometric login</li>
+<li>Continuous session monitoring and automated security checks</li>
+</ul>
+<div class="written-note">
+<strong>Trex Wallet will never ask for your private keys, recovery seed phrase, passwords, or PIN codes.</strong>
+</div>
+
+<h2>Compliance and Privacy</h2>
+<p>We follow FATF recommendations and Canadian anti-money laundering laws, with a zero-tolerance policy on illicit activity. User data is handled in line with PIPEDA and GDPR principles, and we never sell your data to marketers.</p>
+
+<h2>Contact Us</h2>
+<p><strong>Email:</strong> <a href="mailto:Trexwalletcomp00@gmail.com">Trexwalletcomp00@gmail.com</a></p>
+<p><strong>Address:</strong><br />
+Trex Wallet Systems Ltd.<br />
+135 Algoma St, Thunder Bay,<br />
+Ontario, P7A 4T3, Canada</p>
+
+<hr class="divider" />
+<div class="doc-footer">
+<strong>Trex Wallet</strong><br />
+Empowering Your Digital Asset Journey<br />
+Copyright &copy; 2026 Trex Wallet. All Rights Reserved.
+</div>
+</main>
+</body>
+    </html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Tap</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--glass:rgba(255,255,255,.07);--line:rgba(255,255,255,.16);--muted:#a0a0a0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{height:100%;margin:0;background:#000;overscroll-behavior:none}
+body{color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:700;overflow:hidden;touch-action:manipulation}
+b,h2{font-weight:800}
+.app{position:relative;height:100%;height:100dvh;max-width:520px;margin:0 auto;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 12px)}
+
+header{display:flex;align-items:center;justify-content:space-between}
+.btn{height:44px;border-radius:16px;border:1px solid var(--line);background:var(--glass);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;padding:0 12px;font:inherit;transition:transform .1s}
+.btn:active{transform:scale(.94)}
+.circle{width:44px;padding:0;justify-content:center;border-radius:50%}
+.chip{padding:0 16px 0 6px;border-radius:99px;height:46px}
+.who{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;text-align:left}
+.who b{font-size:13px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who small{font-size:11px;color:var(--muted)}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#fff,#bdbdbd);color:#000;font-weight:800;overflow:hidden;flex:none}
+.avatar img{width:100%;height:100%;object-fit:cover}
+
+.balance{text-align:center;margin-top:14px}
+.lbl{color:var(--muted);font-size:12px;letter-spacing:1.5px;text-transform:uppercase}
+.amount{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:2px}
+.amount img{width:40px;height:40px;object-fit:contain;pointer-events:none}
+#balance{font-size:clamp(36px,12vw,52px);font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+#balance.bump{animation:bump .15s}
+@keyframes bump{50%{transform:scale(1.05)}}
+.pill{display:inline-block;margin-top:6px;padding:4px 14px;border-radius:99px;background:var(--glass);border:1px solid var(--line);font-size:13px}
+
+.stage{flex:1;min-height:0;display:grid;place-items:center;position:relative;margin-top:-2vh}
+.glow{position:absolute;width:min(92vw,420px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 65%);filter:blur(18px);pointer-events:none;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.1);opacity:.7}}
+.idle{animation:idle 4s ease-in-out infinite}
+@keyframes idle{50%{transform:translateY(-8px)}}
+.coin{width:min(74vw,330px,44vh);aspect-ratio:1;cursor:pointer;touch-action:none;position:relative;
+  transform:perspective(650px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1));
+  transition:transform .14s cubic-bezier(.2,.8,.3,1);will-change:transform;filter:drop-shadow(0 20px 32px rgba(0,0,0,.8))}
+.coin.press{--s:.93}
+.coin img{width:100%;height:100%;object-fit:contain;pointer-events:none;-webkit-user-drag:none}
+.coin.fallback{border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#ffc83d 45%,#c57a00);box-shadow:inset 0 0 0 10px rgba(255,255,255,.18),inset 0 0 40px rgba(0,0,0,.25)}
+.coin.fallback img{display:none}
+
+.dock{padding:12px 14px;border-radius:20px;background:var(--glass);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.row .r{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+.bar.thin{height:6px}
+.bar div{height:100%;width:0;border-radius:99px;background:#fff;transition:width .25s linear}
+.energy{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.energy.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.btn.sm{height:30px;padding:0 12px;border-radius:99px;font-size:12px}
+.btn:disabled{opacity:.35}
+
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.float{position:absolute;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.8);transform:translate(-50%,-50%);animation:up .9s ease-out forwards}
+@keyframes up{to{transform:translate(-50%,-150px);opacity:0}}
+.spark{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 10px #fff}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 70px);transform:translate(-50%,-20px);opacity:0;z-index:90;padding:10px 18px;border-radius:99px;background:#111;border:1px solid #fff;font-weight:800;font-size:14px;transition:.3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+.sheet{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet.open{opacity:1;pointer-events:auto}
+.panel{width:100%;max-width:520px;max-height:88%;overflow:auto;background:#0a0a0a;border:1px solid var(--line);border-bottom:0;border-radius:26px 26px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom) + 20px);transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.3,1);text-align:center}
+.sheet.open .panel{transform:none}
+.grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 16px}
+.panel .avatar{width:76px;height:76px;font-size:32px;margin:0 auto 10px}
+.panel h2{margin:0;font-size:21px}
+.panel p{margin:4px 0 16px;color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{padding:12px;border-radius:16px;background:var(--glass);border:1px solid var(--line);text-align:left}
+.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.stat b{font-size:16px;font-variant-numeric:tabular-nums;word-break:break-all}
+.span2{grid-column:span 2}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <button class="btn circle" id="backBtn" aria-label="Back">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="btn chip" id="profileBtn" aria-label="Profile">
+      <span class="avatar" data-avatar>P</span>
+      <span class="who"><b id="chipName">Player</b><small id="chipId">ID: —</small></span>
+    </button>
+  </header>
+
+  <section class="balance">
+    <div class="lbl">Balance</div>
+    <div class="amount"><img data-coin alt=""><span id="balance">0.00</span></div>
+    <div class="pill">+<span id="perTap">0.60</span> / tap</div>
+  </section>
+
+  <main class="stage">
+    <div class="glow"></div>
+    <div class="idle"><div class="coin" id="coin"><img data-coin alt="Coin" draggable="false"></div></div>
+  </main>
+
+  <footer class="dock">
+    <div class="row"><span id="lvName"></span><span class="r" id="lvLeft"></span></div>
+    <div class="bar thin"><div id="lvBar"></div></div>
+    <div class="energy" id="energy">
+      <div class="row">
+        <span>⚡ <span id="energyTxt"></span></span>
+        <button class="btn sm" id="boost"><span id="boostTxt"></span></button>
+      </div>
+      <div class="bar"><div id="energyFill" style="width:100%"></div></div>
+    </div>
+  </footer>
+</div>
+
+<div id="fx"></div>
+<div id="toast"></div>
+
+<div class="sheet" id="sheet">
+  <div class="panel">
+    <div class="grab"></div>
+    <span class="avatar" data-avatar>P</span>
+    <h2 id="pName">Player</h2>
+    <p id="pUser"></p>
+    <div class="stats">
+      <div class="stat span2" id="idStat"><small>Telegram ID (tap to copy)</small><b id="sId">—</b></div>
+      <div class="stat"><small>Total earned</small><b id="sEarn"></b></div>
+      <div class="stat"><small>Total taps</small><b id="sTaps"></b></div>
+      <div class="stat"><small>Per tap</small><b id="sPer"></b></div>
+      <div class="stat"><small>Level</small><b id="sLv"></b></div>
+      <div class="stat span2"><small>Playing since</small><b id="sSince"></b></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  /* ========= CONFIG ========= */
+  const CFG = {
+    tapValue: 0.60,          // base coin per tap
+    levelBonus: 0.10,        // har level pe extra per tap (0 = hamesha 0.60)
+    maxEnergy: 1000,
+    energyCost: 1,
+    regenPerSec: 3,
+    boostsPerDay: 3,
+    maxTps: 30,              // max taps/second (autoclicker limit)
+    coinSrc: '../assets/coin.png',
+    homeUrl: '../index.html',
+    api: '',                 // server sync URL, e.g. 'https://yourdomain.com/api/tap'
+    key: 'tap_state_v2'
+  };
+  const LEVELS = [['Bronze','🥉',0],['Silver','🥈',5000],['Gold','🥇',25000],['Platinum','💠',100000],['Diamond','💎',500000],['Legend','👑',2000000]];
+  const U = 100; // integer units (float error se bachne ke liye)
+
+  const $ = id => document.getElementById(id);
+  const coin = $('coin'), fx = $('fx');
+  const tg = window.Telegram && Telegram.WebApp;
+  if (tg) {
+    try { tg.ready(); tg.expand(); } catch (e) {}
+    try { tg.disableVerticalSwipes && tg.disableVerticalSwipes(); } catch (e) {}
+    try { tg.setHeaderColor && tg.setHeaderColor('#000000'); tg.setBackgroundColor && tg.setBackgroundColor('#000000'); } catch (e) {}
+  }
+
+  document.querySelectorAll('img[data-coin]').forEach(im => {
+    im.src = CFG.coinSrc;
+    im.addEventListener('error', () => { im.closest('.coin') ? coin.classList.add('fallback') : (im.style.display = 'none'); });
+  });
+
+  /* ========= STATE ========= */
+  const today = () => new Date().toISOString().slice(0, 10);
+  const num = (v, d) => Number.isFinite(v) ? v : d;
+  function load() {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem(CFG.key)) || {}; } catch (e) {}
+    const dt = s.ts ? Math.max(0, (Date.now() - s.ts) / 1000) : 0;
+    return {
+      units: num(s.units, 0), taps: num(s.taps, 0), since: num(s.since, Date.now()),
+      energy: Math.min(CFG.maxEnergy, num(s.energy, CFG.maxEnergy) + dt * CFG.regenPerSec),
+      boost: s.boost && s.boost.d === today() ? s.boost : { d: today(), left: CFG.boostsPerDay }
+    };
+  }
+  const S = load();
+  let dirty = false, pending = 0;
+
+  function save() {
+    if (!dirty) return;
+    try { localStorage.setItem(CFG.key, JSON.stringify({ ...S, ts: Date.now() })); dirty = false; } catch (e) {}
+  }
+
+  /* ========= HELPERS ========= */
+  const lvl = u => { let i = 0; while (i < LEVELS.length - 1 && u >= LEVELS[i + 1][2] * U) i++; return i; };
+  const tapUnits = () => Math.round((CFG.tapValue + lvl(S.units) * CFG.levelBonus) * U);
+  const fmt = u => (u / U).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  function haptic(type) {
+    if (tg && tg.HapticFeedback) type === 'ok' ? tg.HapticFeedback.notificationOccurred('success') : tg.HapticFeedback.impactOccurred('light');
+    else if (navigator.vibrate) navigator.vibrate(type === 'ok' ? [20, 40, 20] : 8);
+  }
+  let tt;
+  function toast(m) {
+    const t = $('toast'); t.textContent = m; t.classList.add('show');
+    clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  /* ========= RENDER ========= */
+  function renderBalance(bump) {
+    const b = $('balance'); b.textContent = fmt(S.units);
+    if (bump) { b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
+  }
+  function renderLevel() {
+    const i = lvl(S.units), cur = LEVELS[i], nxt = LEVELS[i + 1];
+    $('lvName').textContent = cur[1] + ' ' + cur[0];
+    $('perTap').textContent = (tapUnits() / U).toFixed(2);
+    if (nxt) {
+      const a = cur[2] * U, b = nxt[2] * U;
+      $('lvBar').style.width = Math.min(100, (S.units - a) / (b - a) * 100) + '%';
+      $('lvLeft').textContent = fmt(b - S.units) + ' to ' + nxt[0];
+    } else { $('lvBar').style.width = '100%'; $('lvLeft').textContent = 'MAX'; }
+  }
+  function renderEnergy() {
+    $('energyTxt').textContent = Math.floor(S.energy) + ' / ' + CFG.maxEnergy;
+    $('energyFill').style.width = (S.energy / CFG.maxEnergy * 100) + '%';
+    $('boostTxt').textContent = 'Full ⚡ ' + S.boost.left + '/' + CFG.boostsPerDay;
+    $('boost').disabled = S.boost.left <= 0 || S.energy >= CFG.maxEnergy;
+  }
+
+  /* ========= EFFECTS ========= */
+  function spawnFx(x, y, v) {
+    if (fx.childElementCount > 45) return;
+    const t = document.createElement('div');
+    t.className = 'float';
+    t.textContent = '+' + (v / U).toFixed(2);
+    t.style.left = (x + Math.random() * 40 - 20) + 'px';
+    t.style.top = y + 'px';
+    t.addEventListener('animationend', () => t.remove());
+    fx.appendChild(t);
+    for (let i = 0; i < 5; i++) {
+      const p = document.createElement('i');
+      p.className = 'spark'; p.style.left = x + 'px'; p.style.top = y + 'px';
+      fx.appendChild(p);
+      const a = Math.random() * 6.283, d = 30 + Math.random() * 45;
+      p.animate([
+        { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${Math.cos(a) * d}px),calc(-50% + ${Math.sin(a) * d}px)) scale(0)`, opacity: 0 }
+      ], { duration: 500, easing: 'ease-out' }).onfinish = () => p.remove();
+    }
+  }
+  function shake() {
+    const e = $('energy'); e.classList.remove('shake'); void e.offsetWidth; e.classList.add('shake');
+  }
+
+  /* ========= TAP ========= */
+  const active = new Set(), stamps = [];
+  const allowed = () => {
+    const n = performance.now();
+    while (stamps.length && n - stamps[0] > 1000) stamps.shift();
+    if (stamps.length >= CFG.maxTps) return false;
+    stamps.push(n); return true;
+  };
+
+  coin.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    active.add(e.pointerId);
+    const r = coin.getBoundingClientRect();
+    coin.style.setProperty('--ry', ((e.clientX - r.left) / r.width - .5) * 26 + 'deg');
+    coin.style.setProperty('--rx', -((e.clientY - r.top) / r.height - .5) * 26 + 'deg');
+    coin.classList.add('press');
+
+    if (!e.isTrusted || !allowed()) return;
+    if (S.energy < CFG.energyCost) { shake(); return; }
+
+    const before = lvl(S.units), v = tapUnits();
+    S.energy -= CFG.energyCost; S.units += v; S.taps++; pending++; dirty = true;
+    renderBalance(true); renderEnergy(); renderLevel();
+    spawnFx(e.clientX, e.clientY, v);
+    haptic();
+
+    const after = lvl(S.units);
+    if (after !== before) { toast('🎉 ' + LEVELS[after][1] + ' ' + LEVELS[after][0] + ' unlocked!'); haptic('ok'); }
+  });
+
+  const release = e => {
+    active.delete(e.pointerId);
+    if (!active.size) {
+      coin.classList.remove('press');
+      coin.style.setProperty('--rx', '0deg'); coin.style.setProperty('--ry', '0deg');
+    }
+  };
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => coin.addEventListener(ev, release));
+
+  /* ========= BOOST ========= */
+  $('boost').addEventListener('click', () => {
+    if (S.boost.d !== today()) S.boost = { d: today(), left: CFG.boostsPerDay };
+    if (S.boost.left <= 0 || S.energy >= CFG.maxEnergy) return;
+    S.boost.left--; S.energy = CFG.maxEnergy; dirty = true;
+    renderEnergy(); toast('⚡ Energy full!'); haptic('ok');
+  });
+
+  /* ========= ENERGY REGEN ========= */
+  let last = performance.now();
+  setInterval(() => {
+    const now = performance.now(), dt = (now - last) / 1000; last = now;
+    if (S.energy < CFG.maxEnergy) {
+      S.energy = Math.min(CFG.maxEnergy, S.energy + dt * CFG.regenPerSec);
+      dirty = true; renderEnergy();
+    }
+  }, 250);
+
+  /* ========= TELEGRAM PROFILE (username + user id) ========= */
+  const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  const fullName = user ? ([user.first_name, user.last_name].filter(Boolean).join(' ') || 'User') : 'Player';
+  const handle = user ? (user.username ? '@' + user.username : fullName) : 'Player';
+  const uid = user ? String(user.id) : '—';
+
+  $('chipName').textContent = handle;
+  $('chipId').textContent = 'ID: ' + uid;
+  $('pName').textContent = fullName;
+  $('pUser').textContent = user ? (user.username ? '@' + user.username : 'No username set') : 'Guest mode';
+  $('sId').textContent = uid;
+
+  document.querySelectorAll('[data-avatar]').forEach(av => {
+    if (user && user.photo_url) {
+      const im = new Image(); im.src = user.photo_url; im.alt = '';
+      av.textContent = ''; av.appendChild(im);
+    } else av.textContent = (fullName.charAt(0) || 'P').toUpperCase();
+  });
+
+  $('idStat').addEventListener('click', () => {
+    if (!user) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(uid).then(() => { toast('ID copied'); haptic('ok'); }, () => {});
+    }
+  });
+
+  /* ========= PROFILE SHEET ========= */
+  const sheet = $('sheet');
+  const closeSheet = () => sheet.classList.remove('open');
+  $('profileBtn').addEventListener('click', () => {
+    const i = lvl(S.units);
+    $('sEarn').textContent = fmt(S.units);
+    $('sTaps').textContent = S.taps.toLocaleString('en-IN');
+    $('sPer').textContent = '+' + (tapUnits() / U).toFixed(2);
+    $('sLv').textContent = LEVELS[i][1] + ' ' + LEVELS[i][0];
+    $('sSince').textContent = new Date(S.since).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    sheet.classList.add('open');
+  });
+  sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
+
+  /* ========= NAVIGATION ========= */
+  $('backBtn').addEventListener('click', () => {
+    if (sheet.classList.contains('open')) return closeSheet();
+    dirty = true; save();
+    history.length > 1 ? history.back() : (location.href = CFG.homeUrl);
+  });
+
+  /* ========= SAVE + SERVER SYNC ========= */
+  async function sync() {
+    if (!CFG.api || !pending) return;
+    const n = pending; pending = 0;
+    try {
+      const r = await fetch(CFG.api, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taps: n, initData: tg ? tg.initData : '', t: Date.now() })
+      });
+      if (!r.ok) throw 0;
+    } catch (e) { pending += n; }
+  }
+  setInterval(save, 1000);
+  setInterval(sync, 5000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { dirty = true; save(); sync(); } });
+  addEventListener('pagehide', () => { dirty = true; save(); });
+
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('gesturestart', e => e.preventDefault());
+
+  renderBalance(false); renderLevel(); renderEnergy();
+})();
+</script>
+</body>
+  </html>

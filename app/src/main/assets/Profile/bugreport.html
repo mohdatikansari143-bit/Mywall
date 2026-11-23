@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Bug Report</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* Full Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: #000000 !important;
+      color: #ffffff;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Screen Container */
+    .bug-screen {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #000000;
+      position: relative;
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #000000;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    /* Liquid Glass Back Button */
+    .liquid-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.8),
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.45),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .liquid-btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 45%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+      border-radius: 40px 40px 0 0;
+      pointer-events: none;
+    }
+
+    .liquid-btn:active {
+      transform: scale(0.90);
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .liquid-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* Submit Bug Pill Button */
+    .submit-btn {
+      padding: 9px 22px;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 800;
+      border: none;
+      background: #1a1a1a;
+      color: #555555;
+      cursor: not-allowed;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .submit-btn.active {
+      background: #ffffff;
+      color: #000000;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.25);
+    }
+
+    .submit-btn.active:active {
+      transform: scale(0.95);
+      background: #e2e8f0;
+    }
+
+    /* Main Scrollable Form Area */
+    .editor-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 18px 20px 18px;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+    }
+
+    /* Bug Report Hero Headline */
+    .bug-hero {
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .bug-hero h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+
+    .bug-hero .hero-line1 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ef4444;
+      margin: 0;
+      letter-spacing: 0.1px;
+    }
+
+    .bug-hero .hero-line2 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* 2 Telegram User Info Boxes (Liquid Glass) */
+    .tg-user-boxes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tg-boxes-label {
+      font-size: 13px;
+      font-weight: 900;
+      color: #94a3b8;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+    }
+
+    .liquid-input-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 13px 16px;
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 800;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.12);
+      transition: all 0.2s ease;
+    }
+
+    .liquid-input-box:focus {
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.7),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    }
+
+    .liquid-input-box::placeholder {
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    /* Bug Title Input */
+    .title-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      font-family: 'Inter', sans-serif;
+      resize: none;
+    }
+
+    .title-input::placeholder {
+      color: #555555;
+      font-weight: 800;
+    }
+
+    /* Bug Details Input */
+    .body-input {
+      width: 100%;
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e2e8f0;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.5;
+      font-family: 'Inter', sans-serif;
+      resize: none;
+      min-height: 140px;
+    }
+
+    .body-input::placeholder {
+      color: #555555;
+      font-weight: 700;
+    }
+
+    /* Screenshot Preview Card */
+    .screenshot-preview-box {
+      display: none;
+      position: relative;
+      margin-top: 14px;
+      margin-bottom: 10px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      max-width: 170px;
+    }
+
+    .screenshot-preview-box img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .remove-screenshot-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Bottom Minimal Toolbar (Screenshot only) */
+    .bottom-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px 18px;
+      background: #000000;
+      border-top: 1px solid #1a1a1a;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .attach-photo-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 8px 16px;
+      border-radius: 100px;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .attach-photo-btn:active {
+      transform: scale(0.94);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .attach-photo-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .hidden-file-input {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bug-screen" id="appScreen">
+
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+      <!-- Liquid Glass Back Button -->
+      <button class="liquid-btn" onclick="window.history.back()" title="Back">
+        <svg viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Submit Report Button -->
+      <button class="submit-btn" id="submitBtn" onclick="submitBugReport()">Submit</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="editor-body">
+
+      <!-- Hero Header -->
+      <div class="bug-hero">
+        <h1>Bug Report</h1>
+        <p class="hero-line1">Found a glitch or facing an error?</p>
+        <p class="hero-line2">Explain what went wrong below so our team can investigate and fix it immediately.</p>
+      </div>
+
+      <!-- 2 Liquid Glass Boxes (Enter your user name or id) -->
+      <div class="tg-user-boxes">
+        <span class="tg-boxes-label">Enter your user name or id</span>
+        
+        <input 
+          type="text" 
+          class="liquid-input-box" 
+          id="tgUsername" 
+          placeholder="Enter your user name (@username)" 
+          autocomplete="off"
+        >
+        
+        <input 
+          type="text" 
+          class="liquid-input-box" 
+          id="tgUserId" 
+          placeholder="Enter your user id" 
+          autocomplete="off"
+        >
+      </div>
+
+      <!-- Bug Title / Summary -->
+      <textarea 
+        class="title-input" 
+        id="bugTitle" 
+        rows="1" 
+        placeholder="Bug Summary (e.g. Wallet not loading)"
+        autocomplete="off" 
+        autocorrect="off" 
+        spellcheck="false"
+      ></textarea>
+
+      <!-- Detailed Description -->
+      <textarea 
+        class="body-input" 
+        id="bugDescription" 
+        placeholder="Describe steps to reproduce the bug..."
+        autocomplete="off" 
+        autocorrect="off" 
+        spellcheck="false"
+      ></textarea>
+
+      <!-- Attached Screenshot Preview -->
+      <div class="screenshot-preview-box" id="previewContainer">
+        <img id="screenshotImg" src="" alt="Screenshot">
+        <div class="remove-screenshot-btn" onclick="removeScreenshot()">✕</div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Toolbar (Screenshot only) -->
+    <div class="bottom-toolbar">
+      <button class="attach-photo-btn" onclick="document.getElementById('screenshotInput').click()">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+        <span>Attach Screenshot</span>
+      </button>
+    </div>
+
+    <!-- Hidden Native File Input -->
+    <input type="file" id="screenshotInput" class="hidden-file-input" accept="image/*" onchange="handleFileSelect(event)">
+
+  </div>
+
+  <script>
+    const bugTitle = document.getElementById('bugTitle');
+    const bugDescription = document.getElementById('bugDescription');
+    const tgUsername = document.getElementById('tgUsername');
+    const tgUserId = document.getElementById('tgUserId');
+    const submitBtn = document.getElementById('submitBtn');
+    const screenshotInput = document.getElementById('screenshotInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const screenshotImg = document.getElementById('screenshotImg');
+
+    // Title type hone par submit button activate
+    function checkInputs() {
+      if (bugTitle.value.trim().length > 0) {
+        submitBtn.classList.add('active');
+      } else {
+        submitBtn.classList.remove('active');
+      }
+    }
+
+    bugTitle.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+      checkInputs();
+    });
+
+    bugDescription.addEventListener('input', checkInputs);
+
+    // Photo/Screenshot select handler
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          screenshotImg.src = e.target.result;
+          previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Remove screenshot
+    function removeScreenshot() {
+      screenshotInput.value = "";
+      screenshotImg.src = "";
+      previewContainer.style.display = 'none';
+    }
+
+    // Submit Bug Report
+    function submitBugReport() {
+      if (!bugTitle.value.trim()) return;
+
+      const user = tgUsername.value.trim() || "Not provided";
+      const uid = tgUserId.value.trim() || "Not provided";
+
+      alert(
+        "Bug Report Submitted Successfully!\n" +
+        "Telegram User: " + user + "\n" +
+        "User ID: " + uid + "\n" +
+        "Title: " + bugTitle.value
+      );
+    }
+
+    // --- MOBILE KEYBOARD FLOATING BAR ADJUSTMENT ---
+    if (window.visualViewport) {
+      const handleResize = () => {
+        const viewportHeight = window.visualViewport.height;
+        document.getElementById('appScreen').style.height = `${viewportHeight}px`;
+      };
+
+      window.visualViewport.addEventListener('resize', handleResize);
+      window.visualViewport.addEventListener('scroll', handleResize);
+    }
+  </script>
+
+</body>
+</html>

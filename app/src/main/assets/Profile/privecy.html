@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trex Wallet Privacy Policy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&display=swap">
+<style>
+/* Layout: plain legal reading page. One left-aligned column on black, a simple top bar with the logo, bold text throughout, no motion. */
+:root {
+  --bg: #000000;
+  --fg: #ffffff;
+  --soft: #ececec;
+  --muted: #a3a3a3;
+  --line: #2b2b2b;
+  --panel: #0e0e0e;
+  --accent: #facc15;
+  --accent-ink: #000000;
+  --font: "Lato", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Courier New", Courier, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 72px;
+  overflow-x: hidden;
+}
+.wrap { width: 100%; max-width: 840px; margin: 0 auto; }
+
+/* top bar */
+.site-head { border-bottom: 1px solid var(--line); margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.site-head .wrap { display: flex; align-items: center; gap: 14px; min-height: 76px; }
+.site-head img { width: 44px; height: 44px; display: block; }
+.site-head span { font-weight: 900; font-size: 18px; letter-spacing: .14em; text-transform: uppercase; }
+
+/* title block */
+.doc-label { margin: 56px 0 10px; font-size: 14px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-weight: 900; font-size: clamp(32px, 6vw, 52px); line-height: 1.1; letter-spacing: -.01em; text-wrap: balance; }
+.meta-subtitle { margin: 22px 0 0; padding-bottom: 22px; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.6; color: var(--muted); }
+.intro { margin: 28px 0 0; font-size: 19px; color: var(--soft); }
+
+/* headings */
+h2, h3, h4 { font-weight: 900; color: var(--fg); text-wrap: balance; }
+h2 { font-size: clamp(24px, 3.4vw, 30px); line-height: 1.2; margin: 64px 0 20px; padding-top: 28px; border-top: 1px solid var(--line); }
+h3 { font-size: 19px; line-height: 1.3; margin: 32px 0 12px; }
+h4 { font-size: 17px; margin: 22px 0 8px; }
+h2[id], .toc-title { scroll-margin-top: 16px; }
+.toc-title { border-top: 0; }
+
+/* text */
+p { margin: 0 0 16px; color: var(--soft); text-wrap: pretty; }
+strong { color: var(--fg); font-weight: 900; }
+em { font-style: italic; }
+a { color: var(--fg); font-weight: 900; text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: var(--accent); }
+ul, ol { margin: 0 0 20px; padding-left: 22px; }
+li { margin-bottom: 8px; color: var(--soft); }
+li ul { margin: 8px 0 0; }
+mark { background: var(--accent); color: var(--accent-ink); padding: 1px 5px; border-radius: 2px; font-weight: 900; }
+
+/* contents list */
+.toc-list { list-style: none; padding: 0; margin: 0 0 8px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+.toc-list li { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 680px) { .toc-list { grid-template-columns: minmax(0, 1fr); } }
+
+/* clauses */
+.clause-text { padding-left: 16px; border-left: 2px solid var(--line); }
+
+/* diagrams */
+pre { margin: 22px 0; padding: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; font-family: var(--mono); font-weight: 700; font-size: 13px; line-height: 1.5; color: var(--soft); white-space: pre; overflow-x: auto; max-width: 100%; }
+
+/* table */
+.table-wrap { margin: 22px 0 26px; overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 4px; }
+table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 16px; }
+th, td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { font-size: 13px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: var(--panel); }
+td { color: var(--soft); }
+tr:last-child td { border-bottom: 0; }
+.first-h2 { border-top: 0; margin-top: 40px; }
+
+/* notices */
+.written-note { margin: 28px 0; padding: 18px 20px; background: var(--panel); border-left: 4px solid var(--accent); }
+.written-note strong { color: var(--fg); }
+
+/* footer */
+.divider { border: 0; border-top: 1px solid var(--line); margin: 64px 0 24px; }
+.doc-footer { font-size: 14px; line-height: 1.7; color: var(--muted); }
+.doc-footer strong { color: var(--fg); }
+
+/* scroll: hidden scrollbar + smooth, Instagram style */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar, pre::-webkit-scrollbar, .table-wrap::-webkit-scrollbar { display: none; width: 0; height: 0; }
+body { -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+pre, .table-wrap { scrollbar-width: none; -ms-overflow-style: none; }
+img { max-width: 100%; }
+p, li, td, h1, h2, h3, h4 { overflow-wrap: anywhere; }
+
+/* back button: dark liquid glass */
+.back-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%;
+  color: #fff; text-decoration: none; cursor: pointer;
+  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.04) 45%, rgba(255,255,255,.08));
+  -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.35), inset 0 -8px 16px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.6);
+  transition: transform .2s ease, background .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:hover { color: #fff; background: linear-gradient(145deg, rgba(255,255,255,.24), rgba(255,255,255,.06) 45%, rgba(255,255,255,.12)); }
+.back-btn:active { transform: scale(.92); }
+.back-btn svg { width: 22px; height: 22px; display: block; }
+</style>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="back-btn" href="#" aria-label="Back" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <img src="data:image/png;base64,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" alt="Trex Wallet logo" width="44" height="44">
+    <span>Trex Wallet</span>
+  </div>
+</header>
+
+<main class="wrap">
+<p class="doc-label">Trex Wallet</p>
+        <h1>Privacy Policy</h1>
+        <div class="meta-subtitle"><strong>Last Updated:</strong> 15 August 2026 &nbsp;|&nbsp; <strong>Effective Date:</strong> 15 August 2026</div>
+
+        <h2 class="first-h2">1. Introduction</h2>
+        <p>Welcome to Trex Wallet ("Trex", "we", "us", or "our"). Trex Wallet is a professional digital asset wallet and exchange platform that enables users to store, manage, convert Trex Coin to USDT (Tether), and execute digital asset exchanges. We are committed to protecting your privacy and ensuring the security of your personal data.</p>
+        <p>This Privacy Policy describes how we collect, use, store, disclose, and protect your personal data when you access or use the Trex Wallet mobile application, website, APIs, and related services (collectively, the "Services").</p>
+        <p>By using our Services, you acknowledge that you have read, understood, and agree to the collection and use of your personal data as described in this Privacy Policy. If you do not agree with this policy, please do not use our Services.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 2                                                      -->
+        <!-- ============================================================ -->
+        <h2>2. Personal Data We Collect</h2>
+        <p>We collect and process the following categories of personal data:</p>
+
+        <h3>2.1 Account Information</h3>
+        <ul>
+            <li>Full legal name, date of birth, nationality, and gender</li>
+            <li>Government-issued identification numbers (passport, national ID, driver's license)</li>
+            <li>Residential address and proof of address documentation</li>
+            <li>Email address, phone number, and authentication credentials</li>
+            <li>Account username, profile picture, and security settings</li>
+            <li>KYC (Know Your Customer) verification status and risk classification</li>
+        </ul>
+
+        <h3>2.2 Wallet and Blockchain Data</h3>
+        <ul>
+            <li>Digital wallet addresses generated through our Services</li>
+            <li>Public blockchain transaction records associated with your wallet</li>
+            <li>Trex Coin balances, USDT balances, and other supported digital asset holdings</li>
+            <li>Transaction hashes, timestamps, amounts, and counterparties</li>
+            <li>Smart contract interaction data</li>
+            <li>Network fees and gas usage records</li>
+        </ul>
+
+        <h3>2.3 Transaction and Exchange Data</h3>
+        <ul>
+            <li>Records of Trex Coin to USDT conversions</li>
+            <li>Exchange orders, trade history, and execution details</li>
+            <li>Deposit and withdrawal requests</li>
+            <li>Payment method information (bank account details, card information)</li>
+            <li>Transaction limits and trading preferences</li>
+            <li>Anti-money laundering (AML) screening results</li>
+        </ul>
+
+        <h3>2.4 Device and Technical Information</h3>
+        <ul>
+            <li>IP address, MAC address, and device identifiers</li>
+            <li>Operating system, browser type, and version</li>
+            <li>Device model, manufacturer, and hardware information</li>
+            <li>Mobile network information and carrier details</li>
+            <li>Login timestamps, session duration, and access logs</li>
+            <li>Geolocation data derived from IP address or GPS (with consent)</li>
+        </ul>
+
+        <h3>2.5 Communication Data</h3>
+        <ul>
+            <li>Customer support inquiries and chat transcripts</li>
+            <li>Email correspondence and social media interactions</li>
+            <li>Feedback, surveys, and complaint records</li>
+            <li>Marketing preferences and communication history</li>
+        </ul>
+
+        <h3>2.6 Biometric Data (Optional)</h3>
+        <ul>
+            <li>Facial recognition data for identity verification</li>
+            <li>Fingerprint data for device authentication (processed locally where possible)</li>
+        </ul>
+
+        <h3>2.7 Data from Third Parties</h3>
+        <ul>
+            <li>Identity verification results from KYC/AML service providers</li>
+            <li>Sanctions and politically exposed persons (PEP) screening results</li>
+            <li>Credit and fraud prevention agency reports</li>
+            <li>Public blockchain data and transaction analytics</li>
+            <li>Referral source information</li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 3                                                      -->
+        <!-- ============================================================ -->
+        <h2>3. How We Use Your Personal Data</h2>
+        <p>We process your personal data for the following lawful purposes:</p>
+
+        <h3>3.1 Service Provision</h3>
+        <ul>
+            <li>To create, maintain, and secure your Trex Wallet account</li>
+            <li>To facilitate Trex Coin storage, transfers, and wallet management</li>
+            <li>To process Trex Coin to USDT conversions accurately and efficiently</li>
+            <li>To execute exchange transactions and settle trades</li>
+            <li>To display your portfolio balances, transaction history, and market data</li>
+            <li>To provide customer support and technical assistance</li>
+        </ul>
+
+        <h3>3.2 Legal and Regulatory Compliance</h3>
+        <ul>
+            <li>To comply with applicable anti-money laundering (AML) and counter-terrorism financing (CTF) laws</li>
+            <li>To perform customer due diligence (CDD) and enhanced due diligence (EDD)</li>
+            <li>To verify your identity and prevent identity fraud</li>
+            <li>To comply with tax reporting obligations (e.g., FATCA, CRS)</li>
+            <li>To respond to lawful requests from regulatory authorities, courts, and law enforcement</li>
+            <li>To maintain records required by financial services regulations</li>
+        </ul>
+
+        <h3>3.3 Security and Risk Management</h3>
+        <ul>
+            <li>To monitor for suspicious transactions and detect fraudulent activity</li>
+            <li>To prevent unauthorized access and account takeover attempts</li>
+            <li>To conduct blockchain transaction monitoring and analysis</li>
+            <li>To enforce our Terms of Service and acceptable use policies</li>
+            <li>To protect the integrity and security of our platform and users</li>
+        </ul>
+
+        <h3>3.4 Service Improvement and Analytics</h3>
+        <ul>
+            <li>To analyze usage patterns and improve platform functionality</li>
+            <li>To develop new features, products, and services</li>
+            <li>To conduct research on digital asset markets and user behavior</li>
+            <li>To troubleshoot technical issues and optimize performance</li>
+        </ul>
+
+        <h3>3.5 Marketing and Communications</h3>
+        <ul>
+            <li>To send service-related notifications (transaction confirmations, security alerts)</li>
+            <li>To provide updates on new features, promotions, and market insights (with your consent)</li>
+            <li>To administer referral programs and loyalty rewards</li>
+            <li>To personalize your experience based on your preferences and usage</li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 4                                                      -->
+        <!-- ============================================================ -->
+        <h2>4. Legal Basis for Processing</h2>
+        <p>We process your personal data based on the following grounds:</p>
+        <ul>
+            <li><strong>Performance of Contract:</strong> Processing necessary to provide the Services under our Terms of Use</li>
+            <li><strong>Legal Obligation:</strong> Compliance with applicable laws, regulations, and regulatory guidance</li>
+            <li><strong>Legitimate Interests:</strong> Fraud prevention, security, network integrity, and service improvement</li>
+            <li><strong>Consent:</strong> Marketing communications and optional features (where required by law)</li>
+            <li><strong>Vital Interests:</strong> Protection of life or physical safety in emergency situations</li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 5                                                      -->
+        <!-- ============================================================ -->
+        <h2>5. Disclosure of Personal Data</h2>
+        <p>We may disclose your personal data to the following categories of recipients:</p>
+
+        <h3>5.1 Service Providers and Vendors</h3>
+        <ul>
+            <li>Cloud hosting and data storage providers</li>
+            <li>Identity verification and KYC/AML screening services</li>
+            <li>Blockchain analytics and transaction monitoring firms</li>
+            <li>Payment processors and banking partners</li>
+            <li>Customer support and communication platforms</li>
+            <li>Cybersecurity and fraud detection services</li>
+            <li>Audit and compliance consultants</li>
+        </ul>
+
+        <h3>5.2 Regulatory and Government Authorities</h3>
+        <ul>
+            <li>Financial intelligence units and anti-money laundering agencies</li>
+            <li>Securities and financial regulatory bodies</li>
+            <li>Tax authorities and revenue services</li>
+            <li>Law enforcement agencies and courts</li>
+            <li>Self-regulatory organizations in the digital asset industry</li>
+        </ul>
+        <p>We will only disclose personal data to authorities when required by applicable law, regulation, legal process, or governmental request.</p>
+
+        <h3>5.3 Business Partners</h3>
+        <ul>
+            <li>Cryptocurrency exchanges and liquidity providers for order execution</li>
+            <li>USDT issuance and redemption partners</li>
+            <li>Trex Coin network validators and node operators</li>
+            <li>Merchants and service providers integrated with our platform</li>
+        </ul>
+
+        <h3>5.4 Business Transfers</h3>
+        <p>In the event of a merger, acquisition, reorganization, asset sale, or bankruptcy, your personal data may be transferred to the acquiring entity or successor organization, subject to confidentiality obligations.</p>
+
+        <h3>5.5 Affiliated Entities</h3>
+        <p>We may share personal data with our parent companies, subsidiaries, and affiliated entities for operational, compliance, and security purposes, consistent with this Privacy Policy.</p>
+
+        <h3>5.6 Other Users and Public Blockchain</h3>
+        <p>Please note that blockchain transactions are inherently public. Your wallet addresses, transaction amounts, and timestamps are recorded on public blockchains (such as the Trex Coin network and USDT blockchain) and are visible to anyone. We cannot control or delete information recorded on public blockchains.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 6                                                      -->
+        <!-- ============================================================ -->
+        <h2>6. Blockchain Data and Immutability</h2>
+        <div class="written-note">
+            <strong>IMPORTANT NOTICE REGARDING BLOCKCHAIN TECHNOLOGY:</strong>
+        </div>
+        <p>The Services interact with public blockchain networks. When you initiate a transaction involving Trex Coin, USDT, or other digital assets, the transaction details (including wallet addresses, amounts, and timestamps) are permanently recorded on the respective blockchain ledger.</p>
+        <p>Due to the immutable and decentralized nature of blockchain technology:</p>
+        <ul>
+            <li>We cannot delete, modify, or erase transaction records from public blockchains</li>
+            <li>Your wallet address and transaction history remain publicly visible even after account deletion</li>
+            <li>Blockchain data exists independently of our Services and servers</li>
+            <li>Privacy features of public blockchains are limited by their underlying protocols</li>
+        </ul>
+        <p>By using our Services, you acknowledge and accept these inherent characteristics of blockchain technology.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 7                                                      -->
+        <!-- ============================================================ -->
+        <h2>7. International Data Transfers</h2>
+        <p>Your personal data may be transferred to, stored, and processed in countries other than your country of residence, including countries that may not have equivalent data protection laws. These transfers may occur because:</p>
+        <ul>
+            <li>Our servers and cloud infrastructure are located in multiple jurisdictions</li>
+            <li>Our service providers operate globally</li>
+            <li>Blockchain networks are decentralized and span multiple countries</li>
+            <li>Regulatory reporting may require data sharing with foreign authorities</li>
+        </ul>
+        <p>We implement appropriate safeguards for international transfers, including:</p>
+        <ul>
+            <li>Standard contractual clauses approved by relevant data protection authorities</li>
+            <li>Adequacy decisions where recognized by applicable law</li>
+            <li>Technical and organizational security measures</li>
+            <li>Data processing agreements with strict confidentiality obligations</li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 8                                                      -->
+        <!-- ============================================================ -->
+        <h2>8. Data Retention</h2>
+        <p>We retain your personal data for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required or permitted by law.</p>
+        <p>Retention periods include:</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Data Type</th><th>Retention Period</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Active Account Data</strong></td><td>Retained for the duration of your account activity plus applicable statutory periods</td></tr>
+                    <tr><td><strong>Transaction Records</strong></td><td>Retained for a minimum of 5 (five) years after transaction completion, or longer as required by financial regulations</td></tr>
+                    <tr><td><strong>KYC/AML Documentation</strong></td><td>Retained for 5 (five) years after account closure, or as mandated by anti-money laundering laws</td></tr>
+                    <tr><td><strong>Communication Records</strong></td><td>Retained for 3 (three) years from the date of communication</td></tr>
+                    <tr><td><strong>Blockchain Data</strong></td><td>Permanently retained on public blockchains (outside our control)</td></tr>
+                    <tr><td><strong>Deleted Account Data</strong></td><td>Personal identifiers are deleted or anonymized within 90 days of account closure, except where retention is legally required</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>Factors influencing retention periods include:</p>
+        <ul>
+            <li>Legal and regulatory requirements</li>
+            <li>Financial record-keeping obligations</li>
+            <li>Fraud prevention and security needs</li>
+            <li>Dispute resolution and litigation holds</li>
+            <li>Contractual obligations</li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 9                                                      -->
+        <!-- ============================================================ -->
+        <h2>9. Your Data Protection Rights</h2>
+        <p>Depending on your jurisdiction, you may have the following rights regarding your personal data:</p>
+
+        <h3>9.1 Right to Access</h3>
+        <p>You have the right to request copies of the personal data we hold about you.</p>
+
+        <h3>9.2 Right to Rectification</h3>
+        <p>You have the right to request correction of inaccurate or incomplete personal data.</p>
+
+        <h3>9.3 Right to Erasure ("Right to be Forgotten")</h3>
+        <p>You may request deletion of your personal data, subject to our legal and regulatory retention obligations. Note that we cannot erase data recorded on public blockchains.</p>
+
+        <h3>9.4 Right to Restrict Processing</h3>
+        <p>You may request that we limit the processing of your personal data in certain circumstances.</p>
+
+        <h3>9.5 Right to Data Portability</h3>
+        <p>You have the right to receive your personal data in a structured, commonly used, and machine-readable format.</p>
+
+        <h3>9.6 Right to Object</h3>
+        <p>You may object to processing based on legitimate interests or for direct marketing purposes.</p>
+
+        <h3>9.7 Right to Withdraw Consent</h3>
+        <p>Where processing is based on consent, you may withdraw consent at any time without affecting the lawfulness of prior processing.</p>
+
+        <h3>9.8 Right to Lodge a Complaint</h3>
+        <p>You have the right to file a complaint with your local data protection authority.</p>
+
+        <p>To exercise these rights, please contact us at Trexwalletcomp00@gmail.com or through the Data Rights Portal in your account settings. We will respond within the timeframe required by applicable law (typically 30 days).</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 10                                                     -->
+        <!-- ============================================================ -->
+        <h2>10. Data Security</h2>
+        <p>We implement comprehensive technical, administrative, and physical security measures to protect your personal data, including:</p>
+        <ul>
+            <li>AES-256 encryption for data at rest and TLS 1.3 for data in transit</li>
+            <li>Multi-factor authentication (MFA) and biometric login options</li>
+            <li>Cold storage solutions for majority of digital asset holdings</li>
+            <li>Regular security audits and penetration testing</li>
+            <li>Intrusion detection and real-time threat monitoring</li>
+            <li>Employee background checks and data access controls</li>
+            <li>Incident response and breach notification procedures</li>
+        </ul>
+        <p>Despite these measures, no internet-based service can guarantee absolute security. You are responsible for maintaining the confidentiality of your account credentials, private keys, and recovery phrases. We will never ask for your private keys or wallet recovery seed phrase.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 11                                                     -->
+        <!-- ============================================================ -->
+        <h2>11. Cookies and Tracking Technologies</h2>
+        <p>We use cookies, web beacons, and similar technologies to:</p>
+        <ul>
+            <li>Authenticate users and maintain secure sessions</li>
+            <li>Remember your preferences and settings</li>
+            <li>Analyze traffic patterns and improve user experience</li>
+            <li>Deliver relevant content and measure advertising effectiveness</li>
+        </ul>
+        <p>You can manage cookie preferences through your browser settings. Disabling certain cookies may affect the functionality of our Services.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 12                                                     -->
+        <!-- ============================================================ -->
+        <h2>12. Children's Privacy</h2>
+        <p>Our Services are not intended for individuals under the age of 18 (or the legal age of majority in your jurisdiction). We do not knowingly collect personal data from minors. If we discover that a minor has provided personal data, we will promptly delete such information and terminate the account.</p>
+        <p>Parents or guardians who believe their child has provided personal data without consent should contact us immediately at Trexwalletcomp00@gmail.com.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 13                                                     -->
+        <!-- ============================================================ -->
+        <h2>13. Third-Party Links and Services</h2>
+        <p>Our Services may contain links to third-party websites, applications, or services (including decentralized applications and external exchanges). This Privacy Policy does not apply to third-party services. We encourage you to review the privacy policies of any third-party services you interact with, including when converting Trex Coin to USDT through external liquidity pools.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 14                                                     -->
+        <!-- ============================================================ -->
+        <h2>14. Changes to This Privacy Policy</h2>
+        <p>We may update this Privacy Policy periodically to reflect changes in our practices, legal requirements, or Service functionality. When we make material changes, we will:</p>
+        <ul>
+            <li>Post the updated policy on our website and mobile application</li>
+            <li>Update the "Last Updated" date at the top of this document</li>
+            <li>Notify you via email or in-app notification for significant changes</li>
+        </ul>
+        <p>Your continued use of the Services after changes constitutes acceptance of the revised Privacy Policy. We encourage you to review this policy regularly.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 15                                                     -->
+        <!-- ============================================================ -->
+        <h2>15. Data Controller and Contact Information</h2>
+        <p><strong>For users in the European Economic Area (EEA), United Kingdom, and Switzerland:</strong><br />
+        Data Controller: Trex Wallet Europe Ltd.<br />
+        Registered Address: 135 Algoma St, Thunder Bay, Ontario, P7A 4T3, Canada<br />
+        Email: Trexwalletcomp00@gmail.com</p>
+        <p><strong>For users in all other jurisdictions:</strong><br />
+        Data Controller: Trex Wallet Global Ltd.<br />
+        Registered Address: 135 Algoma St, Thunder Bay, Ontario, P7A 4T3, Canada<br />
+        Email: Trexwalletcomp00@gmail.com</p>
+        <p><strong>Data Protection Officer (DPO):</strong><br />
+        Email: Trexwalletcomp00@gmail.com</p>
+        <p><strong>Customer Support:</strong><br />
+        Email: Trexwalletcomp00@gmail.com</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 16                                                     -->
+        <!-- ============================================================ -->
+        <h2>16. Dispute Resolution</h2>
+        <p>Any disputes arising from this Privacy Policy shall first be attempted to be resolved through good faith negotiations. If unresolved, disputes shall be subject to binding arbitration in accordance with the rules of ICC International Court of Arbitration, or litigation in the courts of Ontario, Canada, as specified in our Terms of Use.</p>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 17                                                     -->
+        <!-- ============================================================ -->
+        <h2>17. Compliance Framework</h2>
+        <p>Trex Wallet operates in compliance with:</p>
+        <ul>
+            <li>General Data Protection Regulation (GDPR) - for EEA/UK users</li>
+            <li>California Consumer Privacy Act (CCPA) / California Privacy Rights Act (CPRA) - for California residents</li>
+            <li>Personal Information Protection and Electronic Documents Act (PIPEDA) - for Canadian users</li>
+            <li>Applicable anti-money laundering (AML) and counter-terrorism financing (CTF) regulations</li>
+            <li>Financial Action Task Force (FATF) recommendations for virtual asset service providers</li>
+            <li>Local licensing requirements in jurisdictions where we operate</li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 18                                                     -->
+        <!-- ============================================================ -->
+        <h2>18. Acknowledgment</h2>
+        <p>By using Trex Wallet, you acknowledge that:</p>
+        <ul>
+            <li>You have read and understood this Privacy Policy</li>
+            <li>You consent to the collection and processing of your personal data as described herein</li>
+            <li>You understand the risks and immutable nature of blockchain transactions</li>
+            <li>You are solely responsible for the security of your private keys and account credentials</li>
+            <li>You are using the Services in compliance with applicable laws in your jurisdiction</li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <!-- FOOTER                                                         -->
+        <!-- ============================================================ -->
+
+        <hr class="divider" />
+        <div class="doc-footer">
+            <strong>Trex Wallet</strong><br />
+            Empowering Your Digital Asset Journey<br />
+            Copyright &copy; 2026 Trex Wallet. All Rights Reserved.
+        </div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Global TRX Leaderboard</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* Full Jet Black Reset */
+    html, body {
+      background-color: #000000 !important;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', Roboto, sans-serif;
+      font-weight: 700;
+      overscroll-behavior-y: none;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      background: #000000;
+    }
+
+    /* Screen Wrapper */
+    .app-screen {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #000000;
+      padding: 16px 18px 42px 18px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================
+       TOP NAVIGATION BAR (Liquid Glass Back Button)
+       ========================================== */
+    .top-nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .glass-back-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.6),
+        0 8px 24px rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+      color: #ffffff;
+      outline: none;
+      padding: 0;
+    }
+
+    .glass-back-btn:active {
+      transform: scale(0.92);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.06) 100%);
+    }
+
+    .glass-back-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.6;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+    }
+
+    .total-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      padding: 6px 14px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Header */
+    .board-header {
+      padding: 2px 2px 18px 2px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .title-group h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+    }
+
+    .title-group p {
+      margin: 4px 0 0 0;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #71717a;
+    }
+
+    /* ==========================================
+       3D LIQUID GLASS PODIUM (Gold, Silver, Bronze)
+       ========================================== */
+    .podium-stage {
+      display: grid;
+      grid-template-columns: 1fr 1.08fr 1fr;
+      align-items: end;
+      gap: 8px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .podium-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-width: 0;
+    }
+
+    /* Floating user info above pedestal (No Boxes) */
+    .podium-user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    .trophy-badge {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      filter: drop-shadow(0 0 14px rgba(234, 179, 8, 0.75));
+      animation: floatTrophy 2.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatTrophy {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .podium-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 7px;
+      position: relative;
+    }
+
+    .podium-avatar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      padding: 1.5px;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .podium-name {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      padding: 0 2px;
+      margin-bottom: 6px;
+    }
+
+    .podium-stat-pill {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 4px 10px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    /* 3D Glass Pedestal Blocks */
+    .podium-block-3d {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.8));
+    }
+
+    .pedestal-top {
+      width: 100%;
+      clip-path: polygon(14% 0%, 86% 0%, 100% 100%, 0% 100%);
+      position: relative;
+    }
+
+    .pedestal-front {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pedestal-front::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    }
+
+    .pedestal-num {
+      font-size: 38px;
+      font-weight: 900;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      letter-spacing: -1.5px;
+    }
+
+    /* 1ST PLACE - GOLD */
+    .podium-column.first .podium-avatar {
+      width: 62px;
+      height: 62px;
+      font-size: 21px;
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.22) 0%, rgba(18, 19, 24, 0.95) 100%);
+      color: #fef08a;
+      box-shadow: 0 0 24px rgba(234, 179, 8, 0.35);
+    }
+    .podium-column.first .podium-avatar::before {
+      background: linear-gradient(135deg, #fde047 0%, rgba(202, 138, 4, 0.4) 100%);
+    }
+    .podium-column.first .podium-stat-pill {
+      background: rgba(234, 179, 8, 0.14);
+      border: 1px solid rgba(234, 179, 8, 0.38);
+      color: #fef08a;
+    }
+    .podium-column.first .pedestal-top {
+      height: 25px;
+      background: linear-gradient(135deg, rgba(254, 240, 138, 0.38) 0%, rgba(202, 138, 4, 0.18) 100%);
+      border-top: 1px solid rgba(254, 240, 138, 0.6);
+    }
+    .podium-column.first .pedestal-front {
+      height: 144px;
+      background: linear-gradient(180deg, rgba(234, 179, 8, 0.18) 0%, #0d0e12 85%);
+      border-left: 1px solid rgba(234, 179, 8, 0.28);
+      border-right: 1px solid rgba(234, 179, 8, 0.28);
+      border-bottom: 1px solid rgba(234, 179, 8, 0.25);
+    }
+    .podium-column.first .pedestal-num {
+      font-size: 50px;
+      background: linear-gradient(180deg, #ffffff 15%, #facc15 80%, #ca8a04 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 14px rgba(234, 179, 8, 0.6));
+    }
+
+    /* 2ND PLACE - SILVER */
+    .podium-column.second .podium-avatar {
+      background: linear-gradient(135deg, rgba(241, 245, 249, 0.18) 0%, rgba(18, 19, 24, 0.95) 100%);
+      color: #f8fafc;
+      box-shadow: 0 0 18px rgba(226, 232, 240, 0.22);
+    }
+    .podium-column.second .podium-avatar::before {
+      background: linear-gradient(135deg, #ffffff 0%, rgba(148, 163, 184, 0.35) 100%);
+    }
+    .podium-column.second .podium-stat-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #f1f5f9;
+    }
+    .podium-column.second .pedestal-top {
+      height: 22px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.32) 0%, rgba(148, 163, 184, 0.14) 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    .podium-column.second .pedestal-front {
+      height: 106px;
+      background: linear-gradient(180deg, rgba(241, 245, 249, 0.12) 0%, #0d0e12 85%);
+      border-left: 1px solid rgba(255, 255, 255, 0.18);
+      border-right: 1px solid rgba(255, 255, 255, 0.18);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .podium-column.second .pedestal-num {
+      font-size: 42px;
+      background: linear-gradient(180deg, #ffffff 20%, #cbd5e1 80%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 10px rgba(226, 232, 240, 0.4));
+    }
+
+    /* 3RD PLACE - BRONZE */
+    .podium-column.third .podium-avatar {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(18, 19, 24, 0.95) 100%);
+      color: #fed7aa;
+      box-shadow: 0 0 18px rgba(249, 115, 22, 0.25);
+    }
+    .podium-column.third .podium-avatar::before {
+      background: linear-gradient(135deg, #fb923c 0%, rgba(194, 65, 12, 0.4) 100%);
+    }
+    .podium-column.third .podium-stat-pill {
+      background: rgba(249, 115, 22, 0.14);
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      color: #fed7aa;
+    }
+    .podium-column.third .pedestal-top {
+      height: 22px;
+      background: linear-gradient(135deg, rgba(253, 186, 116, 0.3) 0%, rgba(194, 65, 12, 0.15) 100%);
+      border-top: 1px solid rgba(253, 186, 116, 0.55);
+    }
+    .podium-column.third .pedestal-front {
+      height: 82px;
+      background: linear-gradient(180deg, rgba(249, 115, 22, 0.12) 0%, #0d0e12 85%);
+      border-left: 1px solid rgba(249, 115, 22, 0.22);
+      border-right: 1px solid rgba(249, 115, 22, 0.22);
+      border-bottom: 1px solid rgba(249, 115, 22, 0.16);
+    }
+    .podium-column.third .pedestal-num {
+      font-size: 38px;
+      background: linear-gradient(180deg, #ffffff 15%, #fdba74 75%, #c2410c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 10px rgba(249, 115, 22, 0.45));
+    }
+
+    /* List Section Header */
+    .list-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px 10px 4px;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 4px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==========================================
+       MAIN LEADERBOARD LIST (NO BOXES / OPEN ROWS)
+       ========================================== */
+    .leaderboard-list {
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .miner-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 4px;
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      content-visibility: auto;
+      contain-intrinsic-size: 58px;
+      transition: background 0.15s ease;
+    }
+
+    .miner-row:active {
+      background: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    .miner-row:last-child {
+      border-bottom: none !important;
+    }
+
+    .miner-left-side {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .rank-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 800;
+      color: #71717a;
+      min-width: 34px;
+      text-align: left;
+    }
+
+    .miner-avatar-mini {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #ffffff;
+      flex-shrink: 0;
+      background: #111216;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .miner-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .miner-name-text {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .miner-hash-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #71717a;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .miner-balance-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .miner-tr-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .miner-status-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    .empty-text {
+      text-align: center;
+      padding: 30px 0;
+      font-size: 13px;
+      color: #71717a;
+    }
+
+    /* List Footer */
+    .loading-sentinel {
+      text-align: center;
+      padding: 18px 0;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #52525b;
+      font-family: 'JetBrains Mono', monospace;
+      position: relative;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-screen">
+
+    <!-- Top Navigation Bar with Liquid Glass Back Button -->
+    <div class="top-nav-bar">
+      <button class="glass-back-btn" onclick="history.back()" aria-label="Go back">
+        <svg viewBox="0 0 24 24">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <span class="total-badge">TOP 100 MINERS</span>
+    </div>
+
+    <!-- Header -->
+    <div class="board-header">
+      <div class="title-group">
+        <h1>Leaderboard</h1>
+        <p>Global Mining Standings</p>
+      </div>
+    </div>
+
+    <!-- 3D LIQUID GLASS PODIUM (Silver #2, Gold #1, Bronze #3) -->
+    <div class="podium-stage" id="podiumArea"></div>
+
+    <!-- List Header -->
+    <div class="list-section-head">
+      <span>Rank &amp; Miner</span>
+      <span>TRX Balance</span>
+    </div>
+
+    <!-- MAIN LEADERBOARD LIST (NO BOXES - Open Seamless Rows) -->
+    <div class="leaderboard-list" id="minersList"></div>
+
+    <!-- List Footer -->
+    <div class="loading-sentinel" id="loadingText">All 100 Miners Displayed</div>
+
+  </div>
+
+  <script>
+    const prefixes = [
+      "Crypto", "Zaryab", "Alex", "Vikram", "Dmitry", "Farhan", "Satoshi", "Shadow",
+      "Hunter", "Viper", "Phoenix", "Nova", "Titan", "Blade", "Zenith", "Apex",
+      "Ghost", "Cyber", "Ahmad", "Rex", "Kaiser", "Lucas", "Elena", "Tariq",
+      "Roman", "Klaus", "Marco", "Yuki", "Hassan", "Malik", "Omar", "Zero"
+    ];
+
+    const suffixes = [
+      "Miner", "Pro", "King", "Node", "Core", "Vault", "Boss", "Hash",
+      "Prime", "X", "Alpha", "Elite", "99", "88", "77", "Max", "Rig", "Pool"
+    ];
+
+    const TOTAL_MINERS = 100;
+    const allMiners = [];
+    let currentBalance = 98450.4;
+
+    for (let i = 1; i <= TOTAL_MINERS; i++) {
+      const p = prefixes[(i * 7) % prefixes.length];
+      const s = suffixes[(i * 13) % suffixes.length];
+      const numTag = (i % 7 === 0) ? `_${(i * 3) % 99}` : "";
+      const name = `${p}_${s}${numTag}`;
+
+      if (i <= 3) {
+        currentBalance -= 8200 + ((i * 170) % 500);
+      } else if (i <= 15) {
+        currentBalance -= 2100 + ((i * 53) % 250);
+      } else if (i <= 50) {
+        currentBalance -= 750 + ((i * 31) % 90);
+      } else {
+        currentBalance -= 320 + ((i * 13) % 40);
+      }
+
+      if (currentBalance < 450.0) currentBalance = 450.0;
+
+      allMiners.push({
+        rank: i,
+        name: name,
+        balance: currentBalance.toFixed(1),
+        initial: name.charAt(0).toUpperCase()
+      });
+    }
+
+    const fmt = v => Number(v).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+    // Render 3D Gold, Silver & Bronze Glass Podium
+    const podiumArea = document.getElementById('podiumArea');
+
+    function renderPodium() {
+      const first = allMiners[0];
+      const second = allMiners[1];
+      const third = allMiners[2];
+
+      podiumArea.innerHTML = `
+        <!-- 2nd Place: SILVER -->
+        <div class="podium-column second">
+          <div class="podium-user-info">
+            <div class="podium-avatar">${second.initial}</div>
+            <span class="podium-name">${second.name}</span>
+            <span class="podium-stat-pill">${fmt(second.balance)} TRX</span>
+          </div>
+          <div class="podium-block-3d">
+            <div class="pedestal-top"></div>
+            <div class="pedestal-front">
+              <span class="pedestal-num">2</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1st Place: GOLD (Tallest + Trophy) -->
+        <div class="podium-column first">
+          <div class="podium-user-info">
+            <div class="trophy-badge">🏆</div>
+            <div class="podium-avatar">${first.initial}</div>
+            <span class="podium-name">${first.name}</span>
+            <span class="podium-stat-pill">${fmt(first.balance)} TRX</span>
+          </div>
+          <div class="podium-block-3d">
+            <div class="pedestal-top"></div>
+            <div class="pedestal-front">
+              <span class="pedestal-num">1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3rd Place: BRONZE -->
+        <div class="podium-column third">
+          <div class="podium-user-info">
+            <div class="podium-avatar">${third.initial}</div>
+            <span class="podium-name">${third.name}</span>
+            <span class="podium-stat-pill">${fmt(third.balance)} TRX</span>
+          </div>
+          <div class="podium-block-3d">
+            <div class="pedestal-top"></div>
+            <div class="pedestal-front">
+              <span class="pedestal-num">3</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Remaining List (4 to 100)
+    const listContainer = document.getElementById('minersList');
+    const displayedData = allMiners.slice(3);
+
+    function renderListItems() {
+      if (!displayedData.length) {
+        listContainer.innerHTML = '<div class="empty-text">No miner found</div>';
+        return;
+      }
+      listContainer.innerHTML = displayedData.map(m => `
+        <div class="miner-row">
+          <div class="miner-left-side">
+            <span class="rank-pill">#${m.rank}</span>
+            <div class="miner-avatar-mini">${m.initial}</div>
+            <div class="miner-info">
+              <span class="miner-name-text">${m.name}</span>
+              <span class="miner-hash-text">${(32.4 + (m.rank % 12)).toFixed(1)} MH/s</span>
+            </div>
+          </div>
+          <div class="miner-balance-right">
+            <span class="miner-tr-val">${fmt(m.balance)} TRX</span>
+            <div class="miner-status-badge">
+              <span class="status-dot"></span> Active Node
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderPodium();
+    renderListItems();
+  </script>
+
+</body>
+</html>

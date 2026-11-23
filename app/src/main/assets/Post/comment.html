@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Comment</title>
+<style>
+*,html,body{scrollbar-width:none!important;-ms-overflow-style:none!important}
+*::-webkit-scrollbar,::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+
+*{margin:0;padding:0;box-sizing:border-box;font-weight:800!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{width:100%;height:100%;height:100dvh;overflow:hidden!important;background:#000;color:#fff;display:flex;justify-content:center}
+.app-frame{width:100%;max-width:440px;height:100dvh;background:#000;display:flex;flex-direction:column;position:relative;overflow:hidden;margin:0 auto}
+
+.top-nav{flex-shrink:0;background:rgba(0,0,0,.96);display:flex;align-items:center;gap:16px;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));z-index:50;border-bottom:1px solid rgba(255,255,255,.06)}
+.top-nav-title{font-size:20px;letter-spacing:-.3px}
+
+.glass{background:rgba(12,12,14,.92);border:1px solid rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.18);box-shadow:0 8px 24px rgba(0,0,0,.95),inset 0 1px 1.5px rgba(255,255,255,.12),inset 0 -1px 2px rgba(0,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s cubic-bezier(.2,.8,.2,1),background .2s}
+.glass:active{transform:scale(.9);background:rgba(5,5,6,.95)}
+.back-btn{width:40px;height:40px}
+
+.scroll-content{flex:1;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-bottom:24px;scroll-behavior:auto}
+
+.liquid-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 8px;border-radius:9999px;background:linear-gradient(180deg,rgba(22,22,26,.98),rgba(8,8,10,.99));border:1px solid rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.18);box-shadow:0 4px 10px rgba(0,0,0,.9),inset 0 1px 1.5px rgba(255,255,255,.12),inset 0 -1px 2px rgba(0,0,0,.9);color:#fff;cursor:pointer;transition:transform .12s ease;flex-shrink:0}
+.liquid-btn:active{transform:scale(.92)}
+.liquid-btn svg{stroke:#fff;fill:none;flex-shrink:0;pointer-events:none}
+.liquid-btn .btn-count{color:#fff;pointer-events:none}
+.liquid-btn.liked{border-color:rgba(249,24,128,.45);background:radial-gradient(120% 120% at 25% 20%,rgba(249,24,128,.25) 0%,rgba(25,10,18,.92) 100%)}
+.liquid-btn.liked svg{fill:#f91880;stroke:#f91880;animation:beat .4s cubic-bezier(.3,1.6,.5,1)}
+.liquid-btn.liked .btn-count{color:#f91880}
+@keyframes beat{0%{transform:scale(.6)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+.liquid-btn.disliked svg{fill:#fff;stroke:#fff}
+.liquid-btn.dislike-btn{width:32px;height:32px;padding:0}
+.liquid-icon-btn{width:32px;height:32px;padding:0}
+.btn-count{font-size:12px;line-height:1}
+
+.post-main{display:flex;padding:12px 16px 4px;position:relative}
+.left-track{display:flex;flex-direction:column;align-items:center;margin-right:12px;flex-shrink:0}
+.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#111;z-index:2}
+.connecting-line{width:2px;background:#333639;flex-grow:1;margin-top:6px;margin-bottom:-16px}
+.post-right{flex:1;min-width:0}
+.post-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.user-meta{display:flex;align-items:center;gap:5px;overflow:hidden;white-space:nowrap}
+.name-txt{font-size:16px;font-weight:900!important}
+.handle-time-txt{font-size:15px;color:#71767b}
+.post-text{font-size:16px;margin-bottom:10px}
+.video-card-wrap{position:relative;width:100%;border-radius:16px;overflow:hidden;background:#0d0e10;border:1px solid rgba(255,255,255,.1);margin-bottom:12px}
+.video-thumb{width:100%;height:380px;object-fit:cover;filter:grayscale(100%) contrast(115%);display:block}
+.video-overlay-text{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);font-size:13px;letter-spacing:1.5px;opacity:.9;pointer-events:none}
+.video-speaker-btn{position:absolute;bottom:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+.post-actions-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0 12px;width:100%}
+
+.comments-head{padding:12px 16px 8px;font-size:15px;color:#71767b;border-top:1px solid rgba(255,255,255,.06);margin-top:6px}
+.reply-item{display:flex;padding:12px 16px 4px;border-top:1px solid rgba(255,255,255,.05);content-visibility:auto;contain-intrinsic-size:150px}
+.reply-avatar-col{margin-right:12px;flex-shrink:0}
+.reply-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#111;border:1.5px solid rgba(255,255,255,.2);display:block}
+.reply-content-col{flex:1;min-width:0}
+.reply-name{font-size:16px;line-height:1.2;display:block}
+.reply-handle{font-size:14px;color:#71767b;display:block}
+.reply-body-text{font-size:17px;margin:8px 0 6px;word-wrap:break-word}
+.timestamp-line{font-size:13px;color:#71767b;margin-bottom:6px}
+
+.bottom-input-bar{flex-shrink:0;width:100%;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(0,0,0,.98);border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;z-index:60}
+.input-avatar-profile{width:36px;height:36px;border-radius:50%;background:#000;border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.input-avatar-profile img{width:100%;height:100%;object-fit:cover}
+.input-fake-field{flex:1;min-width:0;height:42px;border-radius:9999px;background:radial-gradient(120% 120% at 20% 20%,rgba(255,255,255,.07) 0%,rgba(20,20,24,.8) 100%);border:1px solid rgba(255,255,255,.12);border-top:1px solid rgba(255,255,255,.25);display:flex;align-items:center;padding:0 16px;color:#71767b;font-size:15px;cursor:pointer;white-space:nowrap}
+.round-btn{width:40px;height:40px;flex-shrink:0}
+.gif-txt{font-size:12px;color:#fff;letter-spacing:.3px;border:1.8px solid #fff;border-radius:5px;padding:1px 4px}
+</style>
+</head>
+<body>
+<div class="app-frame">
+
+  <div class="top-nav">
+    <div class="glass back-btn" id="backBtn" title="Back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <div class="top-nav-title">Comment</div>
+  </div>
+
+  <div class="scroll-content">
+
+    <div class="post-main">
+      <div class="left-track">
+        <svg class="avatar" viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M50 20c-16.6 0-30 13.4-30 30 0 11 6 20.6 15 25.7V85h30V75.7c9-5.1 15-14.7 15-25.7 0-16.6-13.4-30-30-30zm-5 45h-8v-8h8v8zm18 0h-8v-8h8v8zm-9-15h-8V42h8v8z" fill="#000"/></svg>
+        <div class="connecting-line"></div>
+      </div>
+      <div class="post-right">
+        <div class="post-header-row">
+          <div class="user-meta">
+            <span class="name-txt">Motive</span>
+            <span class="handle-time-txt">@motive_guy001 · 21h</span>
+          </div>
+        </div>
+        <div class="post-text">It's time.....</div>
+        <div class="video-card-wrap">
+          <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=700&auto=format&fit=crop&q=80" alt="" class="video-thumb" decoding="async">
+          <div class="video-overlay-text">LOCK IN.</div>
+          <div class="video-speaker-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          </div>
+        </div>
+        <div class="post-actions-row" id="mainActions"></div>
+      </div>
+    </div>
+
+    <div class="comments-head" id="commentsHead"></div>
+    <div id="commentList"></div>
+  </div>
+
+  <div class="bottom-input-bar">
+    <div class="input-avatar-profile"><img src="https://picsum.photos/seed/me/100" alt="You"></div>
+    <div class="input-fake-field" data-go="comment.html">Post your reply</div>
+    <div class="glass round-btn" title="Photo" data-go="comment.html">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    </div>
+    <div class="glass round-btn" title="GIF" data-go="comment.html"><span class="gif-txt">GIF</span></div>
+  </div>
+</div>
+
+<script>
+const HEART = '<svg width="15" height="15" viewBox="0 0 24 24" stroke-width="2.2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+const DIS = '<svg width="15" height="15" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>';
+const CMT = '<svg width="15" height="15" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
+const VIEWS = '<svg width="15" height="15" viewBox="0 0 24 24" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
+const SHARE = '<svg width="15" height="15" viewBox="0 0 24 24" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+const DOTS = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" stroke="none"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
+
+const cnt = v => v ? `<span class="btn-count">${v}</span>` : '';
+// Order: Like, Dislike, Comment, Views, Share, 3 Dot
+const actions = (likes, comments, views) => `
+  <div class="liquid-btn like-btn" data-act="like" data-base="${toNum(likes)}">${HEART}${cnt(likes)}</div>
+  <div class="liquid-btn dislike-btn" data-act="dislike">${DIS}</div>
+  <div class="liquid-btn" data-go="comment.html">${CMT}${cnt(comments)}</div>
+  <div class="liquid-btn">${VIEWS}${cnt(views)}</div>
+  <div class="liquid-btn liquid-icon-btn" data-act="share">${SHARE}</div>
+  <div class="liquid-btn liquid-icon-btn">${DOTS}</div>`;
+
+function toNum(v){
+  v = String(v||'0').trim().toUpperCase();
+  if(v.endsWith('K')) return Math.round(parseFloat(v)*1000);
+  if(v.endsWith('M')) return Math.round(parseFloat(v)*1000000);
+  return parseInt(v,10)||0;
+}
+
+const comments = [
+  {n:"Mohd Asif", h:"@MohdAsifbzri", t:"💀💀💀", time:"22 Oct", l:"12", c:"1", v:"340"},
+  {n:"Riya Sharma", h:"@riya.vibes", t:"Bhai ye sach mein lock in karne ka time hai", time:"20h", l:"48", c:"2", v:"1.2K"},
+  {n:"Aman", h:"@aman.exe", t:"Kal se pakka 🔥", time:"19h", l:"31", c:"", v:"820"},
+  {n:"Neha Verma", h:"@neha.daily", t:"Motivation hit different at night", time:"17h", l:"22", c:"1", v:"610"},
+  {n:"Kabir", h:"@kabir.clips", t:"Sab bolte hain, karta koi nahi 😭", time:"15h", l:"96", c:"3", v:"2.1K"},
+  {n:"Sana Khan", h:"@sana.k", t:"Need this energy every day", time:"12h", l:"9", c:"", v:"290"},
+  {n:"Rohan", h:"@rohan_07", t:"Done. Starting now.", time:"9h", l:"15", c:"", v:"410"}
+];
+
+document.getElementById('mainActions').innerHTML = actions('2.8K', comments.length, '39K');
+document.getElementById('commentsHead').textContent = comments.length + ' comments';
+document.getElementById('commentList').innerHTML = comments.map((c,i)=>`
+<div class="reply-item">
+  <div class="reply-avatar-col"><img class="reply-avatar" loading="lazy" decoding="async" src="https://picsum.photos/seed/user${i}/100" alt="" onerror="this.style.visibility='hidden'"></div>
+  <div class="reply-content-col">
+    <span class="reply-name">${c.n}</span>
+    <span class="reply-handle">${c.h}</span>
+    <div class="reply-body-text">${c.t}</div>
+    <div class="timestamp-line">${c.time}</div>
+    <div class="post-actions-row">${actions(c.l, c.c, c.v)}</div>
+  </div>
+</div>`).join('');
+
+const fmt = n => n < 1000 ? String(n) : n.toLocaleString('en-US');
+
+function setLike(btn, on){
+  const row = btn.closest('.post-actions-row');
+  const span = btn.querySelector('.btn-count');
+  const base = +btn.dataset.base;
+  btn.classList.toggle('liked', on);
+  if(span) span.textContent = on ? fmt(base+1) : (btn.dataset.orig || span.textContent);
+  if(on && row) row.querySelector('.dislike-btn').classList.remove('disliked');
+}
+
+// Ek hi listener sab buttons ke liye (fast)
+document.addEventListener('click', function(e){
+  const el = e.target.closest('[data-act],[data-go]');
+  if(!el) return;
+
+  if(el.dataset.go){ location.href = el.dataset.go; return; }
+
+  const row = el.closest('.post-actions-row');
+  if(el.dataset.act === 'like'){
+    const span = el.querySelector('.btn-count');
+    if(span && !el.dataset.orig) el.dataset.orig = span.textContent;
+    setLike(el, !el.classList.contains('liked'));
+  } else if(el.dataset.act === 'dislike'){
+    const like = row.querySelector('.like-btn');
+    const on = !el.classList.contains('disliked');
+    el.classList.toggle('disliked', on);
+    if(on && like.classList.contains('liked')) setLike(like, false);
+  } else if(el.dataset.act === 'share'){
+    if(navigator.share) navigator.share({title:document.title, url:location.href}).catch(()=>{});
+  }
+});
+
+// Back -> Home (feed.html)
+document.getElementById('backBtn').addEventListener('click', function(){
+  location.href = 'feed.html';
+});
+</script>
+</body>
+</html>

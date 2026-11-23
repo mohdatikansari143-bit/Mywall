@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Withdrawal Restricted - Trex Wallet</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* Full Black Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: #000000 !important;
+      color: #ffffff;
+      width: 100%;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      overscroll-behavior-y: none;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Screen Frame */
+    .app-screen {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #000000;
+      padding: 16px 22px 34px 22px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Top Bar with Liquid Back Button */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      z-index: 10;
+    }
+
+    .liquid-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.8),
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.45),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .liquid-btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 45%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+      border-radius: 40px 40px 0 0;
+      pointer-events: none;
+    }
+
+    .liquid-btn:active {
+      transform: scale(0.90);
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .liquid-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .header-status-badge {
+      font-size: 11.5px;
+      font-weight: 900;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Main Error Content Section */
+    .error-main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px 4px;
+      margin: auto 0;
+    }
+
+    /* ULTRA-DETAILED CLEAN 3D LOCK GRAPHIC WRAPPER */
+    .illustration-wrap {
+      width: 250px;
+      height: 235px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 22px;
+    }
+
+    .ambient-glow {
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.22) 0%, rgba(245, 158, 11, 0.15) 45%, transparent 75%);
+      filter: blur(28px);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .illustration-wrap svg {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 16px 35px rgba(0, 0, 0, 0.9));
+    }
+
+    /* Error Title */
+    .error-heading {
+      font-size: 27px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    /* Launch Date Highlight Tag */
+    .launch-countdown-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid rgba(234, 179, 8, 0.45);
+      color: #facc15;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 11.5px;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.4px;
+      margin-bottom: 16px;
+    }
+
+    .launch-countdown-pill svg {
+      width: 14px;
+      height: 14px;
+      stroke: #facc15;
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    /* Professional English Explanation */
+    .error-description {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: #94a3b8;
+      max-width: 360px;
+      margin-bottom: 8px;
+    }
+
+    .error-description strong {
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    .encourage-text {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-top: 6px;
+    }
+
+    /* Bottom Action Area */
+    .bottom-actions-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding-top: 10px;
+    }
+
+    /* Retry Button (White Pill) */
+    .btn-retry-white {
+      width: 100%;
+      max-width: 240px;
+      padding: 16px 24px;
+      border-radius: 100px;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 
+        0 10px 30px rgba(255, 255, 255, 0.2),
+        inset 0 2px 2px rgba(255, 255, 255, 0.9);
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+    }
+
+    .btn-retry-white:active {
+      transform: scale(0.96);
+      background: #e2e8f0;
+    }
+
+    /* Blue Help Center Link */
+    .help-center-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #38bdf8;
+      font-size: 13.5px;
+      font-weight: 900;
+      text-decoration: none;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .help-center-link:active {
+      opacity: 0.7;
+    }
+
+    .help-center-link svg {
+      width: 16px;
+      height: 16px;
+      stroke: #38bdf8;
+      stroke-width: 2.6;
+      fill: none;
+      transition: transform 0.2s;
+    }
+
+    .help-center-link:hover svg {
+      transform: translateX(3px);
+    }
+
+    /* Toast Notification */
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(234, 179, 8, 0.5);
+      color: #facc15;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 200;
+      text-align: center;
+    }
+
+    .toast-pill.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-screen">
+
+    <!-- Top Bar: Liquid Back Button -->
+    <div class="top-header">
+      <button class="liquid-btn" onclick="window.history.back()" title="Back">
+        <svg viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <span class="header-status-badge">RESTRICTED</span>
+    </div>
+
+    <!-- Center Section: Clean & Ultra-Detailed 3D Lock Graphic -->
+    <div class="error-main-content">
+      
+      <!-- DETAILED 3D CRYPTO VAULT PADLOCK -->
+      <div class="illustration-wrap">
+        <div class="ambient-glow"></div>
+        
+        <svg viewBox="0 0 280 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- 3D Shackle (Arch) Chrome Gradient -->
+            <linearGradient id="shackleMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#334155"/>
+              <stop offset="18%" stop-color="#94a3b8"/>
+              <stop offset="38%" stop-color="#ffffff"/>
+              <stop offset="60%" stop-color="#cbd5e1"/>
+              <stop offset="82%" stop-color="#475569"/>
+              <stop offset="100%" stop-color="#1e293b"/>
+            </linearGradient>
+
+            <!-- Shackle Specular Highlight Stroke -->
+            <linearGradient id="shackleSpecular" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+              <stop offset="40%" stop-color="#ffffff" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </linearGradient>
+
+            <!-- Outer Bezel Body Gradient -->
+            <linearGradient id="lockBezelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="25%" stop-color="#94a3b8"/>
+              <stop offset="55%" stop-color="#334155"/>
+              <stop offset="85%" stop-color="#cbd5e1"/>
+              <stop offset="100%" stop-color="#0f172a"/>
+            </linearGradient>
+
+            <!-- Titanium Matte Body Face -->
+            <radialGradient id="lockBodyMatte" cx="42%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="#242834"/>
+              <stop offset="50%" stop-color="#141720"/>
+              <stop offset="100%" stop-color="#07080b"/>
+            </radialGradient>
+
+            <!-- Escutcheon Dial Ring Gradient -->
+            <linearGradient id="dialRimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#e2e8f0"/>
+              <stop offset="45%" stop-color="#64748b"/>
+              <stop offset="80%" stop-color="#1e293b"/>
+              <stop offset="100%" stop-color="#cbd5e1"/>
+            </linearGradient>
+
+            <!-- Golden Keyhole Core Glow -->
+            <radialGradient id="keyholeGlow" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#fef08a"/>
+              <stop offset="40%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#b45309"/>
+            </radialGradient>
+
+            <!-- Shadow Filters -->
+            <filter id="lockCastShadow" x="-20%" y="-20%" width="140%" height="150%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+              <feOffset dx="0" dy="16"/>
+              <feComponentTransfer><feFuncA type="linear" slope="0.75"/></feComponentTransfer>
+              <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- 1. Ambient Floor Contact Shadow -->
+          <ellipse cx="140" cy="242" rx="95" ry="14" fill="#000000" filter="blur(8px)" opacity="0.85"/>
+          <ellipse cx="140" cy="240" rx="65" ry="8" fill="#000000" filter="blur(4px)" opacity="0.95"/>
+
+          <!-- 2. SHACKLE (Chrome Polished Heavy Arch) -->
+          <g>
+            <!-- Shackle Depth Cast Shadow -->
+            <path d="M96 100 V64 C96 32 184 32 184 64 V100" stroke="#000000" stroke-width="26" stroke-linecap="round" opacity="0.6"/>
+
+            <!-- Main Thick Shackle Cylinder -->
+            <path d="M96 100 V64 C96 34 184 34 184 64 V100" stroke="url(#shackleMetal)" stroke-width="22" stroke-linecap="round"/>
+
+            <!-- Inner Shackle Rim Edge Shadow -->
+            <path d="M107 100 V66 C107 48 173 48 173 66 V100" stroke="#090d16" stroke-width="2.5" fill="none" opacity="0.7"/>
+
+            <!-- Shackle Top Specular Highlight Glare -->
+            <path d="M96 100 V64 C96 34 184 34 184 64 V100" stroke="url(#shackleSpecular)" stroke-width="5" stroke-linecap="round"/>
+
+            <!-- Chrome Notch Ring at Shackle Base -->
+            <rect x="85" y="86" width="22" height="6" rx="2" fill="#64748b" stroke="#ffffff" stroke-width="0.8"/>
+            <rect x="173" y="86" width="22" height="6" rx="2" fill="#64748b" stroke="#ffffff" stroke-width="0.8"/>
+          </g>
+
+          <!-- 3. LOCK BODY (Chamfered Titanium Vault Body) -->
+          <g filter="url(#lockCastShadow)">
+            <!-- Outer Solid Metallic Bezel -->
+            <rect x="52" y="90" width="176" height="142" rx="34" fill="url(#lockBezelGrad)"/>
+
+            <!-- Stepped Inner Polished Lip -->
+            <rect x="56" y="94" width="168" height="134" rx="30" fill="#0b0d12" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+
+            <!-- Deep Matte Obsidian Face -->
+            <rect x="61" y="99" width="158" height="124" rx="26" fill="url(#lockBodyMatte)"/>
+
+            <!-- Subtle Inner Depth Shadow -->
+            <rect x="63" y="101" width="154" height="120" rx="24" fill="none" stroke="rgba(0,0,0,0.85)" stroke-width="3"/>
+            <!-- Top Light Edge Reflection -->
+            <path d="M85 101 H195" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round"/>
+          </g>
+
+          <!-- 4. FOUR PRECISION CORNER BOLTS (Rivets) -->
+          <circle cx="78" cy="116" r="3.5" fill="#1e222d" stroke="#64748b" stroke-width="1"/>
+          <line x1="76" y1="116" x2="80" y2="116" stroke="#ffffff" stroke-width="0.8"/>
+
+          <circle cx="202" cy="116" r="3.5" fill="#1e222d" stroke="#64748b" stroke-width="1"/>
+          <line x1="200" y1="116" x2="204" y2="116" stroke="#ffffff" stroke-width="0.8"/>
+
+          <circle cx="78" cy="206" r="3.5" fill="#1e222d" stroke="#64748b" stroke-width="1"/>
+          <line x1="76" y1="206" x2="80" y2="206" stroke="#ffffff" stroke-width="0.8"/>
+
+          <circle cx="202" cy="206" r="3.5" fill="#1e222d" stroke="#64748b" stroke-width="1"/>
+          <line x1="200" y1="206" x2="204" y2="206" stroke="#ffffff" stroke-width="0.8"/>
+
+          <!-- 5. CENTRAL HIGH-SECURITY CYLINDER & ESCUTCHEON -->
+          <g>
+            <!-- Heavy Chrome Rotary Ring -->
+            <circle cx="140" cy="161" r="38" fill="url(#dialRimGrad)" stroke="#090d16" stroke-width="2"/>
+            
+            <!-- Dial Step Rim -->
+            <circle cx="140" cy="161" r="32" fill="#0d1017" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>
+
+            <!-- Recessed Core Chamber -->
+            <circle cx="140" cy="161" r="26" fill="#05070a"/>
+            <circle cx="140" cy="161" r="25" fill="none" stroke="rgba(0,0,0,0.9)" stroke-width="2"/>
+
+            <!-- Precision Laser Hash Marks around Dial -->
+            <line x1="140" y1="131" x2="140" y2="134" stroke="#94a3b8" stroke-width="1.5"/>
+            <line x1="140" y1="188" x2="140" y2="191" stroke="#94a3b8" stroke-width="1.5"/>
+            <line x1="110" y1="161" x2="113" y2="161" stroke="#94a3b8" stroke-width="1.5"/>
+            <line x1="167" y1="161" x2="170" y2="161" stroke="#94a3b8" stroke-width="1.5"/>
+          </g>
+
+          <!-- 6. GLOWING AMBER/GOLD KEYHOLE -->
+          <g>
+            <!-- Ambient Keyhole Aura -->
+            <circle cx="140" cy="157" r="12" fill="#f59e0b" filter="blur(6px)" opacity="0.35"/>
+
+            <!-- Golden Keyhole Body -->
+            <circle cx="140" cy="156" r="6" fill="url(#keyholeGlow)"/>
+            <path d="M136 156 L144 156 L142.5 171 L137.5 171 Z" fill="url(#keyholeGlow)"/>
+
+            <!-- Internal Deep Keyway Slit -->
+            <circle cx="140" cy="156" r="3.2" fill="#1f1300"/>
+            <path d="M138 156 L142 156 L141.2 169 L138.8 169 Z" fill="#1f1300"/>
+
+            <!-- Keyhole Metallic Specular Glint -->
+            <circle cx="138.8" cy="154.5" r="1" fill="#ffffff"/>
+          </g>
+
+          <!-- 7. STATUS LED (Top Right Red Security Alert Light) -->
+          <g>
+            <circle cx="198" cy="116" r="3.5" fill="#ef4444" filter="drop-shadow(0 0 7px #ef4444)"/>
+            <circle cx="198" cy="116" r="1.5" fill="#ffffff"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Error Heading -->
+      <h2 class="error-heading">Withdrawal Locked!</h2>
+
+      <!-- Launch Tag -->
+      <div class="launch-countdown-pill">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>TREX KEY LAUNCH: JAN 1, 2027</span>
+      </div>
+
+      <!-- Professional English Notice Message -->
+      <p class="error-description">
+        You cannot withdraw at this time. Withdrawals will become available once your wallet is activated using the official <strong>Trex Key</strong>.
+      </p>
+
+      <p class="error-description">
+        The Trex Key will be officially launched on <strong>January 1, 2027</strong>.
+      </p>
+
+      <p class="encourage-text">
+        Please continue mining and collecting your TR coins until the official activation date.
+      </p>
+
+    </div>
+
+    <!-- Bottom Action & Blue Help Center Link -->
+    <div class="bottom-actions-wrap">
+      <!-- White Retry Button -->
+      <button class="btn-retry-white" onclick="triggerRetry()">Retry</button>
+
+      <!-- Blue Help Center Link -->
+      <a class="help-center-link" onclick="openHelpCenter()">
+        <span>Help Center</span>
+        <svg viewBox="0 0 24 24">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-pill" id="toastPill">Checking key status...</div>
+
+  <script>
+    const toast = document.getElementById('toastPill');
+
+    function showToast(message) {
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2800);
+    }
+
+    // Retry Button Click
+    function triggerRetry() {
+      showToast("Checking Trex Key... Activation locked until Jan 1, 2027.");
+    }
+
+    // Help Center Blue Link Click
+    function openHelpCenter() {
+      alert(
+        "Trex Wallet Support & FAQ:\n\n" +
+        "Q: Why are withdrawals locked?\n" +
+        "A: All early mining rewards are held in cold-vault escrow until network mainnet validation.\n\n" +
+        "Q: When is the Trex Key available?\n" +
+        "A: Official distribution begins on January 1, 2027.\n\n" +
+        "Need personal help? Contact: support@trexminer.app"
+      );
+    }
+  </script>
+
+</body>
+</html>

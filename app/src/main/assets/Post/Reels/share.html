@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Share to</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #000000;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* Main Sheet Container */
+    .share-container {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      background-color: #171719;
+      border-radius: 28px 28px 0 0;
+      padding: 24px 0 32px 0;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .share-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 22px;
+      letter-spacing: -0.2px;
+    }
+
+    /* 1-Line Smooth Horizontal Scroller */
+    .row-scroll {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 2px 20px 6px 20px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .row-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .share-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      width: 66px;
+    }
+
+    /* Circle Wrapper for Logos */
+    .icon-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #222225;
+      transition: transform 0.15s ease, opacity 0.2s;
+    }
+
+    .icon-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 50%;
+    }
+
+    .share-node:active .icon-wrapper {
+      transform: scale(0.92);
+      opacity: 0.85;
+    }
+
+    .node-label {
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 8px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    /* ACTION BUTTONS (Line 2) */
+    .bg-action {
+      background: #0d0d0f;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 18px 20px 20px 20px;
+    }
+
+    /* Toast */
+    .toast-box {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(90px);
+      background: #ffffff;
+      color: #000000;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toast-box.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="share-container">
+    <div class="share-title">Share to</div>
+
+    <!-- LINE 1: ALL SOCIAL MEDIA APPS -->
+    <div class="row-scroll">
+
+      <!-- 1. Bereal -->
+      <button class="share-node" onclick="triggerShare('bereal')">
+        <div class="icon-wrapper">
+          <img src="../assets/Bereal.jpg" alt="BeReal">
+        </div>
+        <span class="node-label">BeReal</span>
+      </button>
+
+      <!-- 2. Discord -->
+      <button class="share-node" onclick="triggerShare('discord')">
+        <div class="icon-wrapper">
+          <img src="../assets/Discord .jpg" alt="Discord">
+        </div>
+        <span class="node-label">Discord</span>
+      </button>
+
+      <!-- 3. Facebook -->
+      <button class="share-node" onclick="triggerShare('facebook')">
+        <div class="icon-wrapper">
+          <img src="../assets/Facebook.jpg" alt="Facebook">
+        </div>
+        <span class="node-label">Facebook</span>
+      </button>
+
+      <!-- 4. Gmail -->
+      <button class="share-node" onclick="triggerShare('gmail')">
+        <div class="icon-wrapper">
+          <img src="../assets/Gmail.jpg" alt="Gmail">
+        </div>
+        <span class="node-label">Gmail</span>
+      </button>
+
+      <!-- 5. Instagram -->
+      <button class="share-node" onclick="triggerShare('instagram')">
+        <div class="icon-wrapper">
+          <img src="../assets/Instagram .jpg" alt="Instagram">
+        </div>
+        <span class="node-label">Instagram</span>
+      </button>
+
+      <!-- 6. Linkedin -->
+      <button class="share-node" onclick="triggerShare('linkedin')">
+        <div class="icon-wrapper">
+          <img src="../assets/Linkedin.jpg" alt="LinkedIn">
+        </div>
+        <span class="node-label">LinkedIn</span>
+      </button>
+
+      <!-- 7. Messages -->
+      <button class="share-node" onclick="triggerShare('messages')">
+        <div class="icon-wrapper">
+          <img src="../assets/Messages.jpg" alt="Messages">
+        </div>
+        <span class="node-label">Messages</span>
+      </button>
+
+      <!-- 8. Pinterest -->
+      <button class="share-node" onclick="triggerShare('pinterest')">
+        <div class="icon-wrapper">
+          <img src="../assets/Pinterest .jpg" alt="Pinterest">
+        </div>
+        <span class="node-label">Pinterest</span>
+      </button>
+
+      <!-- 9. Reddit -->
+      <button class="share-node" onclick="triggerShare('reddit')">
+        <div class="icon-wrapper">
+          <img src="../assets/Reddit.jpg" alt="Reddit">
+        </div>
+        <span class="node-label">Reddit</span>
+      </button>
+
+      <!-- 10. Snapchat -->
+      <button class="share-node" onclick="triggerShare('snapchat')">
+        <div class="icon-wrapper">
+          <img src="../assets/Snapchat .jpg" alt="Snapchat">
+        </div>
+        <span class="node-label">Snapchat</span>
+      </button>
+
+      <!-- 11. Telegram -->
+      <button class="share-node" onclick="triggerShare('telegram')">
+        <div class="icon-wrapper">
+          <img src="../assets/Telegram .jpg" alt="Telegram">
+        </div>
+        <span class="node-label">Telegram</span>
+      </button>
+
+      <!-- 12. Threads -->
+      <button class="share-node" onclick="triggerShare('threads')">
+        <div class="icon-wrapper">
+          <img src="../assets/Threads.jpg" alt="Threads">
+        </div>
+        <span class="node-label">Threads</span>
+      </button>
+
+      <!-- 13. WhatsApp -->
+      <button class="share-node" onclick="triggerShare('whatsapp')">
+        <div class="icon-wrapper">
+          <img src="../assets/WhatsApp .jpg" alt="WhatsApp">
+        </div>
+        <span class="node-label">WhatsApp</span>
+      </button>
+
+      <!-- 14. X -->
+      <button class="share-node" onclick="triggerShare('x')">
+        <div class="icon-wrapper">
+          <img src="../assets/X.jpg" alt="X">
+        </div>
+        <span class="node-label">X</span>
+      </button>
+
+      <!-- 15. Tumblr -->
+      <button class="share-node" onclick="triggerShare('tumblr')">
+        <div class="icon-wrapper">
+          <img src="../assets/tumbir.jpg" alt="Tumblr">
+        </div>
+        <span class="node-label">Tumblr</span>
+      </button>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- LINE 2: SYSTEM ACTION BUTTONS -->
+    <div class="row-scroll">
+
+      <!-- Copy link -->
+      <button class="share-node" onclick="copyLink()">
+        <div class="icon-wrapper bg-action">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+        </div>
+        <span class="node-label">Copy link</span>
+      </button>
+
+      <!-- Share via... -->
+      <button class="share-node" onclick="shareVia()">
+        <div class="icon-wrapper bg-action">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+        </div>
+        <span class="node-label">Share via...</span>
+      </button>
+
+      <!-- Save -->
+      <button class="share-node" onclick="savePost()">
+        <div class="icon-wrapper bg-action">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <span class="node-label">Save</span>
+      </button>
+
+      <!-- Download -->
+      <button class="share-node" onclick="downloadFile()">
+        <div class="icon-wrapper bg-action">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </div>
+        <span class="node-label">Download</span>
+      </button>
+
+      <!-- Report Button -->
+      <button class="share-node" onclick="reportAction()">
+        <div class="icon-wrapper bg-action">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <line x1="4" y1="22" x2="4" y2="15"></line>
+          </svg>
+        </div>
+        <span class="node-label">Report</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Toast Message -->
+  <div class="toast-box" id="toast">Link copied!</div>
+
+  <script>
+    const inviteLink = "https://trexwallet.app/invite";
+    const shareMessage = "Check this out:";
+    const toast = document.getElementById("toast");
+
+    function showToast(text) {
+      toast.innerText = text;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function openInNewTab(url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Social Sharing Handlers
+    function triggerShare(platform) {
+      const encodedUrl = encodeURIComponent(inviteLink);
+      const encodedText = encodeURIComponent(shareMessage);
+      let target = "";
+
+      switch (platform) {
+        case 'whatsapp':
+          target = `https://api.whatsapp.com/send?text=${encodedText}%20${encodedUrl}`;
+          break;
+        case 'telegram':
+          target = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+          break;
+        case 'facebook':
+          target = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+          break;
+        case 'snapchat':
+          target = `https://www.snapchat.com/share?link=${encodedUrl}`;
+          break;
+        case 'gmail':
+          target = `https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=&su=Invite&body=${encodedText}%20${encodedUrl}`;
+          break;
+        case 'messages':
+          window.location.href = `sms:?body=${encodedText}%20${encodedUrl}`;
+          return;
+        case 'pinterest':
+          target = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}`;
+          break;
+        case 'reddit':
+          target = `https://reddit.com/submit?url=${encodedUrl}&title=${encodedText}`;
+          break;
+        case 'x':
+          target = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`;
+          break;
+        case 'threads':
+          target = `https://threads.net/intent/post?text=${encodedText}%20${encodedUrl}`;
+          break;
+        case 'linkedin':
+          target = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+          break;
+        case 'tumblr':
+          target = `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${encodedUrl}&caption=${encodedText}`;
+          break;
+        case 'bereal':
+          navigator.clipboard.writeText(inviteLink);
+          showToast("Link copied! Opening BeReal...");
+          setTimeout(() => openInNewTab('https://bereal.com/'), 350);
+          return;
+        case 'discord':
+          navigator.clipboard.writeText(inviteLink);
+          showToast("Link copied! Opening Discord...");
+          setTimeout(() => openInNewTab('https://discord.com/app'), 350);
+          return;
+        case 'instagram':
+          navigator.clipboard.writeText(inviteLink);
+          showToast("Link copied! Opening Instagram...");
+          setTimeout(() => openInNewTab('https://www.instagram.com/'), 350);
+          return;
+      }
+
+      if (target) {
+        openInNewTab(target);
+      }
+    }
+
+    // Line 2 Handlers
+    function copyLink() {
+      navigator.clipboard.writeText(inviteLink).then(() => {
+        showToast("Link copied to clipboard!");
+      }).catch(() => {
+        showToast("Failed to copy link");
+      });
+    }
+
+    function shareVia() {
+      if (navigator.share) {
+        navigator.share({
+          title: "TrexWallet",
+          text: shareMessage,
+          url: inviteLink,
+        }).catch(() => {});
+      } else {
+        copyLink();
+      }
+    }
+
+    function savePost() {
+      showToast("Saved to your bookmarks!");
+    }
+
+    function downloadFile() {
+      showToast("Download started...");
+    }
+
+    function reportAction() {
+      showToast("Report submitted. Thank you!");
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Edit Profile</title>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Google Fonts: Inter Ultra Bold -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    *::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden !important;
+      background-color: #000000 !important;
+      color: #ffffff;
+      color-scheme: dark;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 900;
+      display: flex;
+      justify-content: center;
+      overscroll-behavior: none;
+    }
+
+    /* Mobile Screen Frame */
+    .app-screen {
+      width: 100%;
+      max-width: 440px;
+      height: 100%;
+      height: 100dvh;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      background: #000000;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: calc(58px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 18px 0 18px;
+      background: rgba(0, 0, 0, 0.94);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border-radius: 50%;
+      color: #ffffff;
+      text-decoration: none;
+      cursor: pointer;
+      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.04) 45%, rgba(255,255,255,.08));
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      backdrop-filter: blur(18px) saturate(180%);
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,.35), inset 0 -6px 12px rgba(0,0,0,.5);
+      transition: transform .12s ease;
+    }
+    .back-btn:active { transform: scale(.92); }
+    .back-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+    .topbar-title {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+    }
+
+    .save-btn {
+      background: none;
+      border: 0;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 16.5px;
+      font-weight: 900;
+      padding: 6px 8px;
+      cursor: pointer;
+      opacity: 0.35;
+      pointer-events: none;
+      transition: all .2s ease;
+    }
+    .save-btn.active {
+      opacity: 1;
+      pointer-events: auto;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    }
+
+    .content-scroll {
+      flex: 1;
+      width: 100%;
+      padding-bottom: calc(45px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Banner Area */
+    .banner {
+      position: relative;
+      width: 100%;
+      height: 145px;
+      background: #0d0d12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid #1a1a24;
+    }
+    .banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .banner img[hidden] { display: none; }
+    
+    .banner-size-badge {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      background: rgba(0, 0, 0, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.4px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .banner-cut-btn {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 4;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .banner-cut-btn:active {
+      transform: scale(0.9);
+      background: rgba(239, 68, 68, 0.5);
+    }
+    .banner-cut-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: #ffffff;
+      stroke-width: 2.8;
+      fill: none;
+    }
+
+    .cam-btn {
+      position: relative;
+      z-index: 2;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .cam-btn svg { width: 22px; height: 22px; stroke: #ffffff; stroke-width: 2.4; fill: none; }
+
+    /* Avatar */
+    .avatar-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 92px;
+      height: 92px;
+      margin: -46px 0 14px 18px;
+    }
+    .avatar-ring {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: #18181b;
+      overflow: hidden;
+      border: 4px solid #000000;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .avatar-ring img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .tg-white-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.35));
+    }
+    .tg-white-badge svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .avatar-wrapper .tg-white-badge {
+      position: absolute;
+      right: -2px;
+      bottom: 2px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #000000;
+      padding: 2px;
+    }
+
+    /* Fields */
+    .fields-group {
+      padding: 0 18px;
+      width: 100%;
+    }
+
+    .field-card {
+      padding: 13px 0;
+      border-bottom: 1px solid #1a1a22;
+    }
+
+    .field-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 900;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tg-chip {
+      font-size: 10.5px;
+      font-weight: 900;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .field-value-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 28px;
+    }
+
+    .field-val {
+      font-size: 17px;
+      font-weight: 900;
+      color: #ffffff;
+      overflow-wrap: anywhere;
+      letter-spacing: -0.2px;
+    }
+
+    /* Bio Box */
+    .bio-box-container {
+      width: 100%;
+      background: #0c0c10;
+      border: 1px solid #20202a;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 4px;
+      transition: border-color 0.2s ease;
+    }
+    .bio-box-container:focus-within {
+      border-color: #ffffff;
+    }
+
+    .bio-textarea {
+      width: 100%;
+      height: 75px;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 15.5px;
+      font-weight: 800;
+      line-height: 1.45;
+      resize: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .bio-textarea::placeholder {
+      color: #475569;
+      font-weight: 800;
+    }
+
+    .word-counter {
+      font-size: 11.5px;
+      font-weight: 900;
+      color: #64748b;
+      transition: color 0.2s ease;
+    }
+    .word-counter.limit-reached {
+      color: #ef4444;
+    }
+
+    /* Age Picker Button */
+    .age-picker-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #0c0c10;
+      border: 1px solid #20202a;
+      color: #ffffff;
+      font-size: 15.5px;
+      font-weight: 800;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .age-picker-btn:active {
+      background: #15151c;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    .age-picker-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.2;
+      flex-shrink: 0;
+    }
+    .age-text {
+      flex: 1;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Links Section */
+    .links-section {
+      margin-top: 18px;
+      width: 100%;
+    }
+
+    .link-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0 10px 0;
+      border-bottom: 1px solid #1a1a22;
+      width: 100%;
+    }
+
+    .link-row input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 800;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .link-row input::placeholder {
+      color: #475569;
+    }
+
+    .del-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(239, 68, 68, 0.14);
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+    .del-btn:active { transform: scale(0.9); }
+    .del-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 3; fill: none; }
+
+    .add-link-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 14px;
+      padding: 13px;
+      border-radius: 14px;
+      background: #0d0d12;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 900;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .add-link-btn:active {
+      background: #171720;
+      border-color: #ffffff;
+      transform: scale(0.98);
+    }
+    .add-link-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.8;
+      fill: none;
+    }
+    .add-link-btn.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+      border-color: #1e1e26;
+      color: #52525b;
+    }
+
+    /* Modal Confirmation */
+    .confirm-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.84);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+    }
+    .confirm-modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .confirm-box {
+      width: 100%;
+      max-width: 320px;
+      background: #111116;
+      border: 1px solid #282836;
+      border-radius: 20px;
+      padding: 22px 20px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.95);
+      transform: scale(0.92);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .confirm-modal-backdrop.show .confirm-box {
+      transform: scale(1);
+    }
+
+    .confirm-title {
+      font-size: 18.5px;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    .confirm-desc {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    .confirm-btn-row {
+      display: flex;
+      gap: 10px;
+    }
+    .confirm-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .confirm-btn:active { transform: scale(0.96); }
+    .no-btn { background: #1e1e26; border: 1px solid #2c2c3a; color: #ffffff; }
+    .yes-btn { background: #ffffff; color: #000000; }
+
+    /* Custom Dark Calendar Modal */
+    .cal-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+    }
+    .cal-modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .cal-sheet {
+      width: 100%;
+      max-width: 350px;
+      background: #101014;
+      border: 1px solid #242430;
+      border-radius: 24px;
+      padding: 20px 18px 18px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.98);
+      transform: scale(0.94);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .cal-modal-backdrop.show .cal-sheet {
+      transform: scale(1);
+    }
+
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .cal-title { font-size: 17px; font-weight: 900; color: #ffffff; }
+    .cal-close-btn {
+      background: #181820;
+      border: 1px solid #282834;
+      color: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .cal-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .cal-arrow-btn {
+      width: 36px;
+      height: 38px;
+      background: #181820;
+      border: 1px solid #2b2b3a;
+      border-radius: 10px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .cal-arrow-btn:active { background: #262634; }
+    .cal-arrow-btn svg { width: 18px; height: 18px; stroke: #ffffff; stroke-width: 2.4; fill: none; }
+
+    .cal-custom-btn {
+      flex: 1;
+      height: 38px;
+      background: #181820;
+      border: 1px solid #2b2b3a;
+      border-radius: 10px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 0 10px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .cal-custom-btn:active { background: #242432; border-color: #ffffff; }
+    .cal-custom-btn svg { width: 14px; height: 14px; stroke: #8e8e93; stroke-width: 2.6; fill: none; }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: #71767b;
+      margin-bottom: 8px;
+    }
+
+    .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 18px;
+    }
+    .cal-day {
+      width: 100%;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #ffffff;
+      border-radius: 50%;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .cal-day:active { background: rgba(255, 255, 255, 0.18); }
+    .cal-day.empty { pointer-events: none; opacity: 0; }
+    .cal-day.selected {
+      background: #ffffff !important;
+      color: #000000 !important;
+      font-weight: 900 !important;
+      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.4);
+    }
+
+    .cal-actions { display: flex; gap: 10px; }
+    .cal-btn-cancel {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      background: #181820;
+      border: 1px solid #282834;
+      color: #a1a1aa;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .cal-btn-confirm {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      background: #ffffff;
+      border: none;
+      color: #000000;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .cal-btn-confirm:active { opacity: 0.85; }
+
+    /* In-Modal Dark List View */
+    .cal-picker-overlay {
+      position: absolute;
+      inset: 0;
+      background: #101014;
+      border-radius: 24px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 16px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .cal-picker-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .cal-picker-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1f1f2a;
+    }
+    .cal-picker-title { font-size: 16.5px; font-weight: 900; color: #ffffff; }
+    .cal-picker-back {
+      background: #181820;
+      border: 1px solid #282834;
+      color: #ffffff;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .cal-picker-list {
+      flex: 1;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cal-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 13px 8px;
+      border-bottom: 1px solid #1a1a24;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cal-picker-row:active { background: #181822; }
+
+    .cal-radio-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #52525b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.15s;
+    }
+    .cal-picker-row.selected .cal-radio-circle { border-color: #ffffff; }
+    .cal-picker-row.selected .cal-radio-circle::after {
+      content: "";
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .cal-picker-label { font-size: 16.5px; font-weight: 800; color: #ffffff; }
+    .cal-picker-row.selected .cal-picker-label { font-weight: 900; }
+
+    /* Toast */
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #18181b;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 14.5px;
+      font-weight: 900;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2000;
+      white-space: nowrap;
+    }
+    .toast-pill.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- White Verified SVG Symbol -->
+  <svg style="display: none;">
+    <symbol id="white-verified-icon" viewBox="0 0 24 24">
+      <path fill="#ffffff" d="M10.29 2.3c.72-.4 1.6-.4 2.32 0l1.45.8c.32.18.68.26 1.05.24l1.65-.1c.82-.05 1.57.43 1.84 1.2l.55 1.56c.12.35.35.65.65.86l1.37.95c.68.47.97 1.34.69 2.12l-.56 1.56c-.13.35-.14.73-.04 1.08l.45 1.6c.23.8-.13 1.66-.86 2.05l-1.47.78c-.33.17-.58.46-.72.81l-.62 1.54c-.31.77-1.11 1.21-1.93 1.06l-1.64-.3c-.37-.07-.75 0-1.09.18l-1.46.79c-.72.39-1.6.39-2.32 0l-1.46-.79c-.34-.18-.72-.25-1.09-.18l-1.64.3c-.82.15-1.62-.29-1.93-1.06l-.62-1.54c-.14-.35-.39-.64-.72-.81l-1.47-.78c-.73-.39-1.09-1.25-.86-2.05l.45-1.6c.1-.35.09-.73-.04-1.08l-.56-1.56c-.28-.78.01-1.65.69-2.12l1.37-.95c.3-.21.53-.51.65-.86l.55-1.56c.27-.77 1.02-1.25 1.84-1.2l1.65.1c.37.02.73-.06 1.05-.24l1.45-.8z"/>
+      <path fill="#000000" d="M9.8 15.6l-3.3-3.3 1.4-1.4 1.9 1.9 5.8-5.8 1.4 1.4-7.2 7.2z"/>
+    </symbol>
+  </svg>
+
+  <div class="app-screen">
+
+    <!-- Top Bar: Instant Navigation Back -->
+    <div class="topbar">
+      <a class="back-btn" href="profile.html" aria-label="Back" onclick="goBack(); return false;">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg>
+      </a>
+      <h1 class="topbar-title">Edit profile</h1>
+      <button class="save-btn" id="saveBtn" onclick="saveProfile()">Save</button>
+    </div>
+
+    <div class="content-scroll">
+
+      <!-- Banner Area (With 735x309 Size Badge & Cut Button) -->
+      <div class="banner" id="banner">
+        <img id="bannerImg" alt="Banner" hidden>
+        <div class="banner-size-badge">735x309 px</div>
+
+        <button type="button" class="banner-cut-btn" id="bannerCutBtn" onclick="openDeleteBannerModal(event)" title="Delete banner">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+
+        <div class="cam-btn" onclick="document.getElementById('bannerFile').click()">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+        </div>
+      </div>
+      <input type="file" id="bannerFile" accept="image/*" hidden>
+
+      <!-- Profile Avatar -->
+      <div class="avatar-wrapper">
+        <div class="avatar-ring">
+          <img id="avatarImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231f2937'/><circle cx='50' cy='40' r='20' fill='%239ca3af'/><path d='M20 85c0-16 14-25 30-25s30 9 30 25' fill='%239ca3af'/></svg>" alt="Telegram Avatar">
+        </div>
+        <span class="tg-white-badge"><svg><use href="#white-verified-icon"></use></svg></span>
+      </div>
+
+      <!-- Main Fields Container -->
+      <div class="fields-group">
+
+        <!-- Name -->
+        <div class="field-card">
+          <div class="field-label-row">
+            <span class="field-label">Name</span>
+            <span class="tg-chip">Telegram</span>
+          </div>
+          <div class="field-value-row">
+            <div class="field-val" id="tgName">Loading...</div>
+            <span class="tg-white-badge"><svg><use href="#white-verified-icon"></use></svg></span>
+          </div>
+        </div>
+
+        <!-- Username -->
+        <div class="field-card">
+          <div class="field-label-row">
+            <span class="field-label">Username</span>
+            <span class="tg-chip">Telegram</span>
+          </div>
+          <div class="field-value-row">
+            <div class="field-val" id="tgUsername">@loading</div>
+            <span class="tg-white-badge"><svg><use href="#white-verified-icon"></use></svg></span>
+          </div>
+        </div>
+
+        <!-- User ID -->
+        <div class="field-card">
+          <div class="field-label-row">
+            <span class="field-label">User ID</span>
+            <span class="tg-chip">Telegram</span>
+          </div>
+          <div class="field-value-row">
+            <div class="field-val" id="tgUserId">000000000</div>
+            <span class="tg-white-badge"><svg><use href="#white-verified-icon"></use></svg></span>
+          </div>
+        </div>
+
+        <!-- Bio Box -->
+        <div class="field-card" style="border-bottom: none; padding-bottom: 0;">
+          <div class="field-label-row">
+            <span class="field-label">Bio</span>
+            <span class="word-counter" id="bioWordCounter">0 / 100 words</span>
+          </div>
+          <div class="bio-box-container">
+            <textarea class="bio-textarea" id="fBio" placeholder="Write bio (max 100 words)..."></textarea>
+          </div>
+        </div>
+
+        <!-- Add Your Age Button -->
+        <div class="field-card" style="border-bottom: 1px solid #1a1a22; padding-top: 16px;">
+          <div class="field-label-row">
+            <span class="field-label">Age / Birthday</span>
+            <span class="tg-chip" id="agePreviewBadge">Not set</span>
+          </div>
+          <div class="age-picker-btn" onclick="openCalendarModal()">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="age-text" id="ageBtnText">Add your age</span>
+          </div>
+        </div>
+
+        <!-- Website Links -->
+        <div class="links-section">
+          <div class="field-label-row">
+            <span class="field-label">Website Links</span>
+            <span class="word-counter" id="linksCountDisplay">(1/3)</span>
+          </div>
+
+          <div id="linksContainer"></div>
+
+          <button type="button" class="add-link-btn" id="addMoreLinkBtn" onclick="addNewLinkBox()">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add more link
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ARE YOU SURE MODAL (Yes / No) -->
+  <div class="confirm-modal-backdrop" id="confirmModal">
+    <div class="confirm-box">
+      <div class="confirm-title">Are you sure?</div>
+      <div class="confirm-desc">Do you want to delete this banner?</div>
+      <div class="confirm-btn-row">
+        <button type="button" class="confirm-btn no-btn" onclick="closeDeleteBannerModal()">No</button>
+        <button type="button" class="confirm-btn yes-btn" onclick="confirmDeleteBanner()">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK CALENDAR MODAL -->
+  <div class="cal-modal-backdrop" id="calModal" onclick="closeCalendarModal(event)">
+    <div class="cal-sheet" onclick="event.stopPropagation()">
+
+      <!-- Main Calendar Grid View -->
+      <div id="calMainView">
+        <div class="cal-header">
+          <span class="cal-title">Select Date of Birth</span>
+          <button type="button" class="cal-close-btn" onclick="closeCalendarModal()">&times;</button>
+        </div>
+
+        <div class="cal-nav-row">
+          <button type="button" class="cal-arrow-btn" onclick="changeMonth(-1)" aria-label="Previous Month">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          
+          <button type="button" class="cal-custom-btn" onclick="openCustomPicker('month')">
+            <span id="calMonthLabel">January</span>
+            <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+
+          <button type="button" class="cal-custom-btn" onclick="openCustomPicker('year')">
+            <span id="calYearLabel">2006</span>
+            <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+
+          <button type="button" class="cal-arrow-btn" onclick="changeMonth(1)" aria-label="Next Month">
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="cal-weekdays">
+          <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+        </div>
+
+        <div class="cal-days-grid" id="calDaysGrid"></div>
+
+        <div class="cal-actions">
+          <button type="button" class="cal-btn-cancel" onclick="closeCalendarModal()">Cancel</button>
+          <button type="button" class="cal-btn-confirm" onclick="applySelectedDate()">Done</button>
+        </div>
+      </div>
+
+      <!-- In-Modal Dark List View -->
+      <div class="cal-picker-overlay" id="calPickerOverlay">
+        <div class="cal-picker-top">
+          <span class="cal-picker-title" id="calPickerTitle">Select Year</span>
+          <button type="button" class="cal-picker-back" onclick="closeCustomPicker()">Back</button>
+        </div>
+        <div class="cal-picker-list" id="calPickerList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-pill" id="toastPill">Details saved</div>
+
+  <script>
+    const saveBtn = document.getElementById('saveBtn');
+    const fBio = document.getElementById('fBio');
+    const bioWordCounter = document.getElementById('bioWordCounter');
+    const bannerImg = document.getElementById('bannerImg');
+    const bannerCutBtn = document.getElementById('bannerCutBtn');
+    const linksContainer = document.getElementById('linksContainer');
+    const addMoreBtn = document.getElementById('addMoreLinkBtn');
+    const linksCountDisplay = document.getElementById('linksCountDisplay');
+    const ageBtnText = document.getElementById('ageBtnText');
+    const agePreviewBadge = document.getElementById('agePreviewBadge');
+
+    let bannerBase64 = '';
+    let selectedDob = '';
+    const MAX_WORDS = 100;
+    const MAX_LINKS = 3;
+
+    function markDirty() {
+      saveBtn.classList.add('active');
+    }
+
+    // Instant Lag-Free Back Navigation
+    function goBack() {
+      window.location.replace('profile.html');
+    }
+
+    function calculateAge(dobString) {
+      if (!dobString) return null;
+      const parts = dobString.split('-');
+      if (parts.length !== 3) return null;
+      const birth = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      if (isNaN(birth.getTime())) return null;
+
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return age >= 0 ? age : 0;
+    }
+
+    // 1. Telegram User Auto-Fetch (Hide Telegram native back button to avoid clash)
+    function initTelegramUser() {
+      let name = "Telegram User";
+      let username = "@user";
+      let userId = "000000000";
+      let photoUrl = "";
+
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+
+        // Hide Telegram native BackButton so it does NOT clash with our app button
+        if (tg.BackButton && tg.BackButton.isVisible) {
+          tg.BackButton.hide();
+        }
+
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+          name = [user.first_name, user.last_name].filter(Boolean).join(" ") || name;
+          username = user.username ? `@${user.username}` : "@user";
+          userId = user.id ? String(user.id) : userId;
+          if (user.photo_url) photoUrl = user.photo_url;
+        }
+      }
+
+      document.getElementById('tgName').innerText = name;
+      document.getElementById('tgUsername').innerText = username;
+      document.getElementById('tgUserId').innerText = userId;
+      if (photoUrl) {
+        document.getElementById('avatarImg').src = photoUrl;
+      }
+    }
+
+    // 2. Strict 100 Words Bio
+    fBio.addEventListener('input', function () {
+      let text = this.value;
+      let words = text.trim().split(/\s+/).filter(Boolean);
+
+      if (words.length > MAX_WORDS) {
+        const trimmedWords = words.slice(0, MAX_WORDS);
+        this.value = trimmedWords.join(' ');
+        words = trimmedWords;
+        bioWordCounter.classList.add('limit-reached');
+      } else {
+        bioWordCounter.classList.remove('limit-reached');
+      }
+
+      bioWordCounter.innerText = `${words.length} / ${MAX_WORDS} words`;
+      markDirty();
+    });
+
+    // 3. Dynamic Website Links
+    let linksList = [''];
+
+    function renderLinks() {
+      linksContainer.innerHTML = '';
+      linksList.forEach((val, idx) => {
+        const row = document.createElement('div');
+        row.className = 'link-row';
+        row.innerHTML = `
+          <input type="url" inputmode="url" placeholder="https://example.com" value="${val}" data-idx="${idx}">
+          ${linksList.length > 1 ? `
+            <button type="button" class="del-btn" onclick="removeLink(${idx})" title="Remove link">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          ` : ''}
+        `;
+        linksContainer.appendChild(row);
+      });
+
+      linksCountDisplay.innerText = `(${linksList.length}/${MAX_LINKS})`;
+
+      if (linksList.length >= MAX_LINKS) {
+        addMoreBtn.classList.add('disabled');
+        addMoreBtn.innerText = 'Max 3 links reached';
+      } else {
+        addMoreBtn.classList.remove('disabled');
+        addMoreBtn.innerHTML = `
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add more link
+        `;
+      }
+
+      linksContainer.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', (e) => {
+          const index = e.target.getAttribute('data-idx');
+          linksList[index] = e.target.value.trim();
+          markDirty();
+        });
+      });
+    }
+
+    function addNewLinkBox() {
+      if (linksList.length >= MAX_LINKS) return;
+      linksList.push('');
+      renderLinks();
+      markDirty();
+    }
+
+    function removeLink(index) {
+      if (linksList.length <= 1) return;
+      linksList.splice(index, 1);
+      renderLinks();
+      markDirty();
+    }
+
+    // 4. Banner Strict 735x309 Check & Cut Button Logic
+    document.getElementById('bannerFile').addEventListener('change', function () {
+      const file = this.files && this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          if (img.width !== 735 || img.height !== 309) {
+            triggerToast('Only 735x309 px size is acceptable!');
+            document.getElementById('bannerFile').value = '';
+            return;
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = 735;
+          canvas.height = 309;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 735, 309);
+          bannerBase64 = canvas.toDataURL('image/jpeg', 0.9);
+          bannerImg.src = bannerBase64;
+          bannerImg.hidden = false;
+          bannerCutBtn.style.display = 'flex';
+          markDirty();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function openDeleteBannerModal(e) {
+      if (e) e.stopPropagation();
+      document.getElementById('confirmModal').classList.add('show');
+    }
+
+    function closeDeleteBannerModal() {
+      document.getElementById('confirmModal').classList.remove('show');
+    }
+
+    function confirmDeleteBanner() {
+      bannerBase64 = '';
+      bannerImg.src = '';
+      bannerImg.hidden = true;
+      document.getElementById('bannerFile').value = '';
+      bannerCutBtn.style.display = 'none';
+      closeDeleteBannerModal();
+      markDirty();
+      triggerToast('Banner deleted');
+    }
+
+    // 5. Custom Dark Calendar Logic
+    const calModal = document.getElementById('calModal');
+    const calDaysGrid = document.getElementById('calDaysGrid');
+    const calMonthLabel = document.getElementById('calMonthLabel');
+    const calYearLabel = document.getElementById('calYearLabel');
+    const calPickerOverlay = document.getElementById('calPickerOverlay');
+    const calPickerTitle = document.getElementById('calPickerTitle');
+    const calPickerList = document.getElementById('calPickerList');
+
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    let currentCalYear = 2006;
+    let currentCalMonth = 0;
+    let tempSelectedDate = null;
+
+    function openCalendarModal() {
+      if (selectedDob) {
+        const p = selectedDob.split('-');
+        tempSelectedDate = {
+          year: parseInt(p[0]),
+          month: parseInt(p[1]) - 1,
+          day: parseInt(p[2])
+        };
+        currentCalYear = tempSelectedDate.year;
+        currentCalMonth = tempSelectedDate.month;
+      } else {
+        const defaultYear = 2006;
+        currentCalYear = defaultYear;
+        currentCalMonth = 0;
+        tempSelectedDate = { year: defaultYear, month: 0, day: 1 };
+      }
+
+      updateCalendarLabels();
+      renderCalDays();
+      closeCustomPicker();
+      calModal.classList.add('show');
+    }
+
+    function closeCalendarModal() {
+      calModal.classList.remove('show');
+      closeCustomPicker();
+    }
+
+    function updateCalendarLabels() {
+      calMonthLabel.innerText = monthNames[currentCalMonth];
+      calYearLabel.innerText = currentCalYear;
+    }
+
+    function changeMonth(delta) {
+      currentCalMonth += delta;
+      if (currentCalMonth < 0) {
+        currentCalMonth = 11;
+        currentCalYear--;
+      } else if (currentCalMonth > 11) {
+        currentCalMonth = 0;
+        currentCalYear++;
+      }
+      updateCalendarLabels();
+      renderCalDays();
+    }
+
+    function renderCalDays() {
+      calDaysGrid.innerHTML = '';
+
+      const firstDayIndex = new Date(currentCalYear, currentCalMonth, 1).getDay();
+      const startOffset = (firstDayIndex + 6) % 7;
+      const totalDaysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+
+      for (let i = 0; i < startOffset; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'cal-day empty';
+        calDaysGrid.appendChild(emptyDiv);
+      }
+
+      for (let d = 1; d <= totalDaysInMonth; d++) {
+        const dayBtn = document.createElement('button');
+        dayBtn.type = 'button';
+        dayBtn.className = 'cal-day';
+        dayBtn.innerText = d;
+
+        if (
+          tempSelectedDate &&
+          tempSelectedDate.year === currentCalYear &&
+          tempSelectedDate.month === currentCalMonth &&
+          tempSelectedDate.day === d
+        ) {
+          dayBtn.classList.add('selected');
+        }
+
+        dayBtn.onclick = () => {
+          tempSelectedDate = {
+            year: currentCalYear,
+            month: currentCalMonth,
+            day: d
+          };
+          renderCalDays();
+        };
+
+        calDaysGrid.appendChild(dayBtn);
+      }
+    }
+
+    function openCustomPicker(type) {
+      calPickerList.innerHTML = '';
+
+      if (type === 'month') {
+        calPickerTitle.innerText = 'Select Month';
+        monthNames.forEach((name, idx) => {
+          const isSel = (idx === currentCalMonth);
+          const row = document.createElement('div');
+          row.className = `cal-picker-row ${isSel ? 'selected' : ''}`;
+          row.innerHTML = `
+            <div class="cal-radio-circle"></div>
+            <span class="cal-picker-label">${name}</span>
+          `;
+          row.onclick = () => {
+            currentCalMonth = idx;
+            updateCalendarLabels();
+            renderCalDays();
+            closeCustomPicker();
+          };
+          calPickerList.appendChild(row);
+        });
+      } else if (type === 'year') {
+        calPickerTitle.innerText = 'Select Year';
+        const nowYear = new Date().getFullYear();
+        for (let y = nowYear; y >= 1950; y--) {
+          const isSel = (y === currentCalYear);
+          const row = document.createElement('div');
+          row.className = `cal-picker-row ${isSel ? 'selected' : ''}`;
+          row.innerHTML = `
+            <div class="cal-radio-circle"></div>
+            <span class="cal-picker-label">${y}</span>
+          `;
+          row.onclick = () => {
+            currentCalYear = y;
+            updateCalendarLabels();
+            renderCalDays();
+            closeCustomPicker();
+          };
+          calPickerList.appendChild(row);
+
+          if (isSel) {
+            setTimeout(() => row.scrollIntoView({ block: 'center' }), 60);
+          }
+        }
+      }
+
+      calPickerOverlay.classList.add('open');
+    }
+
+    function closeCustomPicker() {
+      calPickerOverlay.classList.remove('open');
+    }
+
+    function applySelectedDate() {
+      if (!tempSelectedDate) {
+        closeCalendarModal();
+        return;
+      }
+      const y = tempSelectedDate.year;
+      const m = String(tempSelectedDate.month + 1).padStart(2, '0');
+      const d = String(tempSelectedDate.day).padStart(2, '0');
+      selectedDob = `${y}-${m}-${d}`;
+
+      const age = calculateAge(selectedDob);
+      if (age !== null) {
+        ageBtnText.innerText = `${age} years old (${selectedDob})`;
+        agePreviewBadge.innerText = `${age} yrs`;
+      }
+      markDirty();
+      closeCalendarModal();
+    }
+
+    // 6. Save Profile
+    function saveProfile() {
+      const validLinks = Array.from(linksContainer.querySelectorAll('input'))
+        .map(i => i.value.trim())
+        .filter(Boolean);
+
+      const profileData = {
+        bio: fBio.value.trim(),
+        dob: selectedDob,
+        links: validLinks.length > 0 ? validLinks : [''],
+        banner: bannerBase64
+      };
+
+      try {
+        localStorage.setItem('trex_profile_data', JSON.stringify(profileData));
+      } catch (e) {}
+
+      saveBtn.classList.remove('active');
+      triggerToast('Details saved');
+    }
+
+    function loadSavedProfile() {
+      try {
+        const data = JSON.parse(localStorage.getItem('trex_profile_data') || '{}');
+        if (data.bio) {
+          fBio.value = data.bio;
+          const words = data.bio.trim().split(/\s+/).filter(Boolean);
+          bioWordCounter.innerText = `${words.length} / ${MAX_WORDS} words`;
+        }
+        if (data.dob) {
+          selectedDob = data.dob;
+          const age = calculateAge(selectedDob);
+          if (age !== null) {
+            ageBtnText.innerText = `${age} years old (${selectedDob})`;
+            agePreviewBadge.innerText = `${age} yrs`;
+          }
+        }
+        if (data.links && Array.isArray(data.links) && data.links.length > 0) {
+          linksList = data.links.slice(0, MAX_LINKS);
+        }
+        if (data.banner) {
+          bannerBase64 = data.banner;
+          bannerImg.src = bannerBase64;
+          bannerImg.hidden = false;
+          bannerCutBtn.style.display = 'flex';
+        } else {
+          bannerCutBtn.style.display = 'none';
+        }
+      } catch (err) {}
+
+      renderLinks();
+    }
+
+    function triggerToast(text) {
+      const toast = document.getElementById("toastPill");
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    initTelegramUser();
+    loadSavedProfile();
+  </script>
+
+</body>
+        </html>

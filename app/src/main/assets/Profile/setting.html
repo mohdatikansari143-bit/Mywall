@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Trex Wallet Settings</title>
+
+  <!-- Google Fonts: Inter Ultra Bold -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Official TON Connect UI SDK -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    /* Remove Scrollbar Line Everywhere */
+    *::-webkit-scrollbar,
+    *::-webkit-scrollbar-thumb,
+    *::-webkit-scrollbar-track {
+      width: 0px !important;
+      height: 0px !important;
+      display: none !important;
+      background: transparent !important;
+      opacity: 0 !important;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden !important;
+      background-color: #000000 !important;
+      color: #ffffff;
+      color-scheme: dark;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 800;
+      display: flex;
+      justify-content: center;
+      overscroll-behavior: none;
+    }
+
+    /* Screen Frame with Smooth Native Scrolling */
+    .app-screen {
+      width: 100%;
+      max-width: 440px;
+      height: 100%;
+      height: 100dvh;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      background: #000000;
+      position: relative;
+      padding-bottom: 40px;
+    }
+
+    /* Top bar with liquid-glass back button */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: calc(12px + env(safe-area-inset-top, 0px)) 20px 14px 20px;
+      background: rgba(0, 0, 0, 0.85);
+      -webkit-backdrop-filter: blur(15px);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border-radius: 50%;
+      color: #ffffff;
+      text-decoration: none;
+      cursor: pointer;
+      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.04) 45%, rgba(255,255,255,.08));
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      backdrop-filter: blur(18px) saturate(180%);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,.35), inset 0 -8px 16px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.6);
+      transition: transform .2s ease;
+    }
+    .back-btn:active { transform: scale(.92); }
+    .back-btn svg { width: 22px; height: 22px; display: block; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+    .topbar-title { 
+      flex: 1; 
+      font-size: 20px; 
+      font-weight: 900; 
+      letter-spacing: -0.4px; 
+      color: #ffffff;
+    }
+
+    /* Menu Sections */
+    .menu-group-list {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 20px 0 20px;
+    }
+
+    .section-category-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #64748b;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 22px 0 6px 4px;
+    }
+
+    .menu-card {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      margin-top: 0;
+    }
+
+    .setting-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: opacity 0.15s ease;
+    }
+    .setting-item-row:last-child { border-bottom: none; }
+    .setting-item-row:active { opacity: 0.55; }
+
+    .setting-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .setting-icon-box {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #ffffff;
+    }
+    .setting-icon-box svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 2.3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .setting-title {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+    }
+
+    .chevron-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #52525b;
+    }
+    .chevron-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: #52525b;
+      stroke-width: 2.6;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Footer */
+    .site-footer {
+      position: relative;
+      z-index: 1;
+      margin: 36px 20px 0 20px;
+      padding: 24px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid #1c1c1f;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+    .footer-brand img { width: 32px; height: 32px; display: block; border-radius: 8px; }
+    .footer-copy { margin-top: 10px; font-size: 13px; font-weight: 800; letter-spacing: .02em; color: #71717a; }
+
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #18181b;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 13.5px;
+      font-weight: 900;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2000;
+      white-space: nowrap;
+    }
+    .toast-pill.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .app-screen.hidden { display: none !important; }
+
+    /* Account subpage styles */
+    .switch-row { cursor: pointer; }
+    .switch-right { display: flex; align-items: center; gap: 12px; }
+    .switch-state { font-size: 13px; font-weight: 800; color: #71717a; min-width: 44px; text-align: right; }
+    .switch {
+      position: relative; width: 50px; height: 30px; flex: 0 0 50px;
+      border-radius: 100px; background: #27272a;
+      transition: background .25s ease;
+    }
+    .switch::after {
+      content: ""; position: absolute; top: 3px; left: 3px;
+      width: 24px; height: 24px; border-radius: 50%; background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.5);
+      transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .switch.on { background: #22c55e; }
+    .switch.on::after { transform: translateX(20px); }
+
+    /* TON Wallet styles */
+    .ton-page-container { padding: 20px 20px 40px 20px; display: flex; flex-direction: column; gap: 16px; }
+    .ton-status-card { width: 100%; background: #0e0e11; border: 1px solid #1f1f24; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .ton-status-header { display: flex; align-items: center; justify-content: space-between; }
+    .ton-status-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 800; }
+    .ton-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; font-size: 12.5px; font-weight: 900; }
+    .ton-status-badge.connected { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.35); }
+    .ton-status-badge.disconnected { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .ton-status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .ton-address-box { background: #18181c; border: 1px solid #27272f; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; word-break: break-all; }
+    .ton-address-text { font-size: 13px; font-weight: 800; color: #38bdf8; font-family: monospace; }
+    .copy-btn { background: #27272a; border: none; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+    .copy-btn:active { transform: scale(0.95); }
+    .disconnect-btn { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; text-align: center; }
+    .open-connect-sheet-btn { width: 100%; height: 52px; border-radius: 16px; background: #2563eb; border: none; color: #ffffff; font-size: 16px; font-weight: 900; letter-spacing: -0.2px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35); transition: transform 0.15s ease, opacity 0.15s ease; }
+    .open-connect-sheet-btn:active { transform: scale(0.98); opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+  <!-- ================= MAIN SETTINGS PAGE ================= -->
+  <div class="app-screen" id="mainPage">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <a class="back-btn" href="#" aria-label="Back" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg>
+      </a>
+      <h1 class="topbar-title">TREX WALLET SETTINGS</h1>
+    </div>
+
+    <!-- SETTINGS LIST -->
+    <div class="menu-group-list">
+
+      <!-- 1. ACCOUNT & PROFILE -->
+      <div class="section-category-title">1. Account & Profile</div>
+      <div class="menu-card">
+
+        <!-- Account Settings -->
+        <div class="setting-item-row" onclick="openAccount()">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <span class="setting-title">Account Settings</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+        <!-- Connect Your TON Wallet -->
+        <div class="setting-item-row" onclick="openTonWallet()">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+            </div>
+            <span class="setting-title">Connect Your TON Wallet</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- 2. SECURITY & PRIVACY -->
+      <div class="section-category-title">2. Security & Privacy</div>
+      <div class="menu-card">
+
+        <!-- Bug Report (Opens bugreport.html directly) -->
+        <div class="setting-item-row" onclick="location.href='bugreport.html'">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M8 2l1.88 1.88"></path><path d="M14.12 3.88L16 2"></path><path d="M9 7.13v-1a3 3 0 1 1 6 0v1"></path><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"></path><path d="M12 20v-9"></path><path d="M6.53 9C4.6 8.8 3 7.1 3 5"></path><path d="M6 13H2"></path><path d="M3 21c0-2.1 1.7-3.9 3.8-4"></path><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"></path><path d="M22 13h-4"></path><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"></path></svg>
+            </div>
+            <span class="setting-title">Bug Report</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+        <!-- Privacy Policy (Opens privecy.html directly) -->
+        <div class="setting-item-row" onclick="location.href='privecy.html'">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+            </div>
+            <span class="setting-title">Privacy Policy</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+        <!-- Agreement (Opens agreement.html directly) -->
+        <div class="setting-item-row" onclick="location.href='agreement.html'">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </div>
+            <span class="setting-title">Agreement</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+        <!-- About Trexwallet (Opens about.html directly) -->
+        <div class="setting-item-row" onclick="location.href='about.html'">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </div>
+            <span class="setting-title">About Trexwallet</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+        <!-- Service (Opens service.html directly) -->
+        <div class="setting-item-row" onclick="location.href='service.html'">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            </div>
+            <span class="setting-title">Service</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- 3. PREFERENCE & SUPPORT -->
+      <div class="section-category-title">3. Preference & Support</div>
+      <div class="menu-card">
+
+        <!-- Language (Opens language.html directly) -->
+        <div class="setting-item-row" onclick="location.href='language.html'">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </div>
+            <span class="setting-title">Language</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+        <!-- Help and support (Opens @Trexx_help_bot directly on Telegram) -->
+        <div class="setting-item-row" onclick="if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.openTelegramLink){Telegram.WebApp.openTelegramLink('https://t.me/Trexx_help_bot');}else{window.open('https://t.me/Trexx_help_bot','_blank');}">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+            </div>
+            <span class="setting-title">Help & Support</span>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <span>Trex Wallet</span>
+      </div>
+      <p class="footer-copy">&copy; 2026 Trex Wallet. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+
+  <!-- ================= TON WALLET CONNECT SUB-PAGE ================= -->
+  <div class="app-screen hidden" id="tonWalletPage">
+    <div class="topbar">
+      <a class="back-btn" href="#" aria-label="Back" onclick="closeTonWallet();return false;">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg>
+      </a>
+      <h1 class="topbar-title">CONNECT TON WALLET</h1>
+    </div>
+
+    <div class="ton-page-container">
+      <div class="ton-status-card" id="tonStatusCard">
+        <div class="ton-status-header">
+          <span class="ton-status-title">Connection Status</span>
+          <span class="ton-status-badge disconnected" id="tonStatusBadge">
+            <span class="ton-status-dot"></span>
+            <span id="tonStatusText">Disconnected</span>
+          </span>
+        </div>
+
+        <div id="tonAddressSection" style="display: none;">
+          <div style="font-size: 11.5px; color: #94a3b8; font-weight: 800; margin-bottom: 6px;">CONNECTED REAL ADDRESS:</div>
+          <div class="ton-address-box">
+            <span class="ton-address-text" id="tonAddressDisplay">UQ...</span>
+            <button class="copy-btn" onclick="copyTonAddress()">Copy</button>
+          </div>
+          <button class="disconnect-btn" onclick="disconnectTonWallet()" style="width:100%; margin-top:8px;">Disconnect Wallet</button>
+        </div>
+      </div>
+
+      <button class="open-connect-sheet-btn" id="connectWalletBtn" onclick="handleConnectWallet()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+        Connect your wallet
+      </button>
+
+      <div id="ton-connect-btn" style="display: none;"></div>
+    </div>
+  </div>
+
+
+  <!-- ================= ACCOUNT SETTINGS SUB-PAGE ================= -->
+  <div class="app-screen hidden" id="accountPage">
+    <div class="topbar">
+      <a class="back-btn" href="#" aria-label="Back" onclick="closeAccount();return false;">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg>
+      </a>
+      <h1 class="topbar-title">ACCOUNT SETTINGS</h1>
+    </div>
+    <div class="menu-group-list">
+      <div class="menu-card">
+        <div class="setting-item-row switch-row" onclick="toggleSwitch('autoupdate')">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><polyline points="21 3 21 8 16 8"></polyline></svg>
+            </div>
+            <span class="setting-title">Auto Update</span>
+          </div>
+          <div class="switch-right"><div class="switch" id="sw-autoupdate"></div></div>
+        </div>
+
+        <div class="setting-item-row switch-row" onclick="toggleSwitch('notification')">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+            </div>
+            <span class="setting-title">Notification</span>
+          </div>
+          <div class="switch-right"><div class="switch" id="sw-notification"></div></div>
+        </div>
+
+        <div class="setting-item-row switch-row" onclick="toggleSwitch('replycomments')">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <span class="setting-title">Reply on Comments</span>
+          </div>
+          <div class="switch-right"><div class="switch" id="sw-replycomments"></div></div>
+        </div>
+
+        <div class="setting-item-row switch-row" onclick="toggleSwitch('hideprofile')">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9"></path><path d="M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+            </div>
+            <span class="setting-title">Hide Profile</span>
+          </div>
+          <div class="switch-right"><div class="switch" id="sw-hideprofile"></div></div>
+        </div>
+
+        <div class="setting-item-row switch-row" onclick="toggleSwitch('private')">
+          <div class="setting-left">
+            <div class="setting-icon-box">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <span class="setting-title">Private / Public</span>
+          </div>
+          <div class="switch-right"><span class="switch-state" id="st-private"></span><div class="switch" id="sw-private"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-pill" id="toastPill">Action Done!</div>
+
+  <script>
+    /* ===== Account Settings Switches logic ===== */
+    var SW_KEYS = ['autoupdate','notification','replycomments','hideprofile','private'];
+    var SW_DEFAULT = {autoupdate:true, notification:true, replycomments:true, hideprofile:false, private:false};
+    var swState = {};
+    try { swState = JSON.parse(localStorage.getItem('trex_account_switches') || '{}'); } catch(e) { swState = {}; }
+
+    function renderSwitch(k) {
+      var on = (k in swState) ? swState[k] : SW_DEFAULT[k];
+      var el = document.getElementById('sw-' + k);
+      if (el) el.classList.toggle('on', !!on);
+      if (k === 'private') {
+        var st = document.getElementById('st-private');
+        if (st) st.textContent = on ? 'Private' : 'Public';
+      }
+    }
+    function toggleSwitch(k) {
+      var cur = (k in swState) ? swState[k] : SW_DEFAULT[k];
+      swState[k] = !cur;
+      try { localStorage.setItem('trex_account_switches', JSON.stringify(swState)); } catch(e) {}
+      renderSwitch(k);
+    }
+    SW_KEYS.forEach(renderSwitch);
+
+    /* ===== Navigation Management for In-Page Subpages ===== */
+    function showPage(pageId) {
+      document.getElementById('mainPage').classList.toggle('hidden', pageId !== 'main');
+      document.getElementById('accountPage').classList.toggle('hidden', pageId !== 'account');
+      document.getElementById('tonWalletPage').classList.toggle('hidden', pageId !== 'tonwallet');
+    }
+
+    function openAccount() { location.hash = 'account'; }
+    function closeAccount() { if (location.hash === '#account') { history.back(); } else { showPage('main'); } }
+
+    function openTonWallet() { location.hash = 'tonwallet'; }
+    function closeTonWallet() { if (location.hash === '#tonwallet') { history.back(); } else { showPage('main'); } }
+
+    function handleHashRoute() {
+      var h = location.hash;
+      if (h === '#account') {
+        showPage('account');
+      } else if (h === '#tonwallet') {
+        showPage('tonwallet');
+      } else {
+        showPage('main');
+      }
+    }
+    window.addEventListener('hashchange', handleHashRoute);
+    handleHashRoute();
+
+    function triggerToast(text) {
+      const toast = document.getElementById("toastPill");
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    /* ===== Official TON Connect SDK Integration ===== */
+    let tonConnectUI = null;
+    let connectedUserFriendlyAddress = "";
+
+    function initTonConnect() {
+      try {
+        if (typeof TON_CONNECT_UI !== 'undefined') {
+          tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-btn'
+          });
+
+          tonConnectUI.onStatusChange((wallet) => {
+            if (wallet && wallet.account) {
+              updateTonWalletState(wallet);
+            } else {
+              resetTonWalletState();
+            }
+          });
+        }
+      } catch(err) {
+        console.warn("TonConnect notice:", err);
+      }
+    }
+    window.addEventListener('DOMContentLoaded', initTonConnect);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initTonConnect();
+    }
+
+    function updateTonWalletState(wallet) {
+      const rawAddress = wallet.account.address;
+      if (typeof TON_CONNECT_UI !== 'undefined' && TON_CONNECT_UI.toUserFriendlyAddress) {
+        connectedUserFriendlyAddress = TON_CONNECT_UI.toUserFriendlyAddress(rawAddress);
+      } else {
+        connectedUserFriendlyAddress = rawAddress;
+      }
+
+      const badge = document.getElementById('tonStatusBadge');
+      if (badge) {
+        badge.className = "ton-status-badge connected";
+        document.getElementById('tonStatusText').textContent = "Status: Success (Connected)";
+      }
+      
+      const addrSec = document.getElementById('tonAddressSection');
+      if (addrSec) addrSec.style.display = 'block';
+      const addrDisp = document.getElementById('tonAddressDisplay');
+      if (addrDisp) addrDisp.textContent = connectedUserFriendlyAddress;
+      const connBtn = document.getElementById('connectWalletBtn');
+      if (connBtn) connBtn.style.display = 'none';
+      
+      triggerToast("TON Wallet Connected Successfully!");
+    }
+
+    function resetTonWalletState() {
+      connectedUserFriendlyAddress = "";
+      const badge = document.getElementById('tonStatusBadge');
+      if (badge) {
+        badge.className = "ton-status-badge disconnected";
+        document.getElementById('tonStatusText').textContent = "Disconnected";
+      }
+      const addrSec = document.getElementById('tonAddressSection');
+      if (addrSec) addrSec.style.display = 'none';
+      const addrDisp = document.getElementById('tonAddressDisplay');
+      if (addrDisp) addrDisp.textContent = "";
+      const connBtn = document.getElementById('connectWalletBtn');
+      if (connBtn) connBtn.style.display = 'flex';
+    }
+
+    async function handleConnectWallet() {
+      try {
+        if (!tonConnectUI) initTonConnect();
+        if (tonConnectUI) {
+          await tonConnectUI.openModal();
+        } else {
+          const sdkBtn = document.querySelector('#ton-connect-btn button');
+          if (sdkBtn) sdkBtn.click();
+        }
+      } catch (err) {
+        console.error("Open modal error:", err);
+        const sdkBtn = document.querySelector('#ton-connect-btn button');
+        if (sdkBtn) sdkBtn.click();
+      }
+    }
+
+    async function disconnectTonWallet() {
+      if (tonConnectUI && tonConnectUI.connected) {
+        await tonConnectUI.disconnect();
+      }
+      resetTonWalletState();
+      triggerToast("Wallet Disconnected");
+    }
+
+    function copyTonAddress() {
+      if (!connectedUserFriendlyAddress) return;
+      navigator.clipboard.writeText(connectedUserFriendlyAddress).then(() => {
+        triggerToast("TON Address Copied!");
+      });
+    }
+  </script>
+
+</body>
+  </html>

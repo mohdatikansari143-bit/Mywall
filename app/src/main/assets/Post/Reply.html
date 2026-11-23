@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Reply</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* Full Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: #000000 !important;
+      color: #ffffff;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Screen Container */
+    .reply-screen {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #000000;
+      position: relative;
+    }
+
+    /* ==========================================
+       TOP BAR (Cross & White Reply Button)
+       ========================================== */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #000000;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    /* Close (✕) Button */
+    .close-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 50%;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .close-btn:active {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(0.92);
+    }
+
+    .close-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke: #ffffff;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* White Reply Button */
+    .reply-btn {
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 900;
+      border: none;
+      background: #1a1a1a;
+      color: #555555;
+      cursor: not-allowed;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Active state: Pure White Button with Black text */
+    .reply-btn.active {
+      background: #ffffff;
+      color: #000000;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.25);
+    }
+
+    .reply-btn.active:active {
+      transform: scale(0.95);
+      background: #e2e8f0;
+    }
+
+    /* ==========================================
+       MAIN EDITOR AREA
+       ========================================== */
+    .editor-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 4px 16px 14px 16px;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+    }
+
+    /* Replying line & username */
+    .thread-indicator-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .thread-line-col {
+      width: 38px;
+      display: flex;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .thread-line {
+      width: 2px;
+      height: 20px;
+      background: #2f3336;
+      border-radius: 2px;
+    }
+
+    .replying-to-text {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #71767b;
+      line-height: 1.4;
+      padding-top: 2px;
+    }
+
+    /* Username only in BLUE */
+    .reply-user-link {
+      color: #1d9bf0;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    /* Editor Row (Avatar + Input) */
+    .editor-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    /* Trex Logo Avatar */
+    .reply-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #000000;
+      border: 1.5px solid #2f3336;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .reply-avatar svg {
+      width: 20px;
+      height: 20px;
+      fill: #ffffff;
+    }
+
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Textarea */
+    .reply-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.45;
+      font-family: 'Inter', sans-serif;
+      resize: none;
+      min-height: 120px;
+      padding-top: 6px;
+    }
+
+    .reply-textarea::placeholder {
+      color: #71767b;
+      font-weight: 700;
+    }
+
+    /* Media Preview Box */
+    .media-preview-container {
+      display: none;
+      margin: 12px 0;
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #333333;
+      background: #0d0e12;
+      max-height: 220px;
+    }
+
+    .media-preview-container img,
+    .media-preview-container video {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .remove-media-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 900;
+      z-index: 5;
+    }
+
+    /* ==========================================
+       BOTTOM TOOLBAR (White Icons like makepost)
+       ========================================== */
+    .bottom-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 10px 14px;
+      background: #000000;
+      border-top: 1px solid #1a1a1a;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .tool-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .tool-btn:active {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(0.90);
+    }
+
+    .tool-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .tool-btn span {
+      font-size: 22px;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .hidden-file-input {
+      display: none;
+    }
+
+    /* Custom Link Modal Popup */
+    .custom-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .custom-modal-card {
+      width: 100%;
+      max-width: 360px;
+      background: #14151a;
+      border: 1px solid #2e3038;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .custom-modal-title {
+      font-size: 17px;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .custom-modal-input {
+      width: 100%;
+      background: #000000;
+      border: 1px solid #333336;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #ffffff;
+      font-size: 14.5px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+
+    .custom-modal-input:focus {
+      border-color: #1d9bf0;
+    }
+
+    .custom-modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 5px;
+    }
+
+    .modal-btn {
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+    }
+
+    .modal-btn.cancel {
+      background: #252730;
+      color: #e2e8f0;
+    }
+
+    .modal-btn.confirm {
+      background: #ffffff;
+      color: #000000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="reply-screen" id="appScreen">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <!-- ✕ Close Button -->
+      <button class="close-btn" onclick="goBack()" title="Cancel">
+        <svg viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- White Reply Button -->
+      <button class="reply-btn" id="replyBtn" onclick="submitReply()">Reply</button>
+    </div>
+
+    <!-- Main Editor Area -->
+    <div class="editor-body">
+      
+      <!-- Thread Indicator: Replying to @username -->
+      <div class="thread-indicator-wrap">
+        <div class="thread-line-col">
+          <div class="thread-line"></div>
+        </div>
+        <div class="replying-to-text">
+          Replying to <span class="reply-user-link" id="replyTargetUser">@glmslmgun</span>
+        </div>
+      </div>
+
+      <!-- Input Row (Avatar + Textarea + Media) -->
+      <div class="editor-row">
+        <!-- Trex / T Avatar -->
+        <div class="reply-avatar">
+          <svg viewBox="0 0 512 512">
+            <path d="M256 116 L310 192 V340 L256 415 L202 340 V192 Z"/>
+            <path d="M66 116 H244 L200 182 C184 162 165 155 149 155 C176 172 180 196 180 203 H130 L66 116 Z"/>
+            <path d="M446 116 H268 L312 182 C328 162 347 155 363 155 C336 172 332 196 332 203 H382 L446 116 Z"/>
+          </svg>
+        </div>
+
+        <div class="input-wrap">
+          <!-- Textarea -->
+          <textarea 
+            class="reply-textarea" 
+            id="replyInput" 
+            placeholder="Post your reply" 
+            rows="1"
+            autocomplete="off" 
+            autocorrect="off" 
+            spellcheck="false"
+          ></textarea>
+
+          <!-- Media Preview (Photo/Video) -->
+          <div class="media-preview-container" id="mediaPreviewBox">
+            <button class="remove-media-btn" onclick="clearAttachedMedia()">×</button>
+            <img id="previewImageEl" src="" alt="preview" style="display:none;">
+            <video id="previewVideoEl" src="" controls playsinline style="display:none;"></video>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Toolbar (Tools like makepost.html with White Icons) -->
+    <div class="bottom-toolbar">
+      
+      <!-- 1. Link -->
+      <button class="tool-btn" type="button" onclick="openLinkModal()" title="Link">
+        <svg viewBox="0 0 24 24">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+      </button>
+
+      <!-- 2. Photo -->
+      <button class="tool-btn" type="button" onclick="document.getElementById('photoInput').click()" title="Photo">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+      </button>
+
+      <!-- 3. Video -->
+      <button class="tool-btn" type="button" onclick="document.getElementById('videoInput').click()" title="Video">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"></circle>
+          <polygon points="10 8 16 12 10 16 10 8" fill="#ffffff" stroke="none"></polygon>
+        </svg>
+      </button>
+
+      <!-- 4. Hashtag (#) -->
+      <button class="tool-btn" type="button" onclick="insertText('#')" title="Hashtag">
+        <span>#</span>
+      </button>
+
+      <!-- 5. @ Mention -->
+      <button class="tool-btn" type="button" onclick="insertText('@')" title="Mention">
+        <span>@</span>
+      </button>
+
+    </div>
+
+    <!-- Hidden Native File Inputs -->
+    <input type="file" id="photoInput" class="hidden-file-input" accept="image/*">
+    <input type="file" id="videoInput" class="hidden-file-input" accept="video/*">
+
+  </div>
+
+  <!-- Custom Link Modal Popup -->
+  <div class="custom-modal-overlay" id="linkModalOverlay">
+    <div class="custom-modal-card">
+      <div class="custom-modal-title">Insert Link</div>
+      <input type="url" id="linkInputValue" class="custom-modal-input" placeholder="https://example.com">
+      <div class="custom-modal-actions">
+        <button class="modal-btn cancel" type="button" onclick="closeLinkModal()">Cancel</button>
+        <button class="modal-btn confirm" type="button" onclick="confirmInsertLink()">Add Link</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const replyInput = document.getElementById('replyInput');
+    const replyBtn = document.getElementById('replyBtn');
+    const photoInput = document.getElementById('photoInput');
+    const videoInput = document.getElementById('videoInput');
+    const mediaPreviewBox = document.getElementById('mediaPreviewBox');
+    const previewImageEl = document.getElementById('previewImageEl');
+    const previewVideoEl = document.getElementById('previewVideoEl');
+    const replyTargetUser = document.getElementById('replyTargetUser');
+
+    let attachedPhotoData = null;
+    let attachedVideoData = null;
+
+    // URL se dynamic username read karna (agar reply.html?to=@username pass karein)
+    const urlParams = new URLSearchParams(window.location.search);
+    const toUser = urlParams.get('to');
+    if (toUser) {
+      replyTargetUser.innerText = toUser.startsWith('@') ? toUser : '@' + toUser;
+    }
+
+    // Go back to feed smoothly
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'feed.html';
+      }
+    }
+
+    // Check Eligibility to activate white button
+    function checkEligibility() {
+      const hasText = replyInput.value.trim().length > 0;
+      const hasMedia = attachedPhotoData !== null || attachedVideoData !== null;
+
+      if (hasText || hasMedia) {
+        replyBtn.classList.add('active');
+      } else {
+        replyBtn.classList.remove('active');
+      }
+    }
+
+    // Auto resize reply textarea
+    replyInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+      checkEligibility();
+    });
+
+    // ==========================================
+    // 1. PHOTO UPLOAD (Compressed)
+    // ==========================================
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let w = img.width;
+          let h = img.height;
+
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          attachedPhotoData = canvas.toDataURL('image/jpeg', 0.72);
+          attachedVideoData = null;
+
+          previewVideoEl.style.display = 'none';
+          previewVideoEl.src = '';
+          previewImageEl.src = attachedPhotoData;
+          previewImageEl.style.display = 'block';
+          mediaPreviewBox.style.display = 'block';
+
+          checkEligibility();
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // ==========================================
+    // 2. VIDEO UPLOAD
+    // ==========================================
+    videoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        attachedVideoData = evt.target.result;
+        attachedPhotoData = null;
+
+        previewImageEl.style.display = 'none';
+        previewImageEl.src = '';
+        previewVideoEl.src = attachedVideoData;
+        previewVideoEl.style.display = 'block';
+        mediaPreviewBox.style.display = 'block';
+
+        checkEligibility();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function clearAttachedMedia() {
+      attachedPhotoData = null;
+      attachedVideoData = null;
+      photoInput.value = '';
+      videoInput.value = '';
+      previewImageEl.src = '';
+      previewVideoEl.src = '';
+      previewImageEl.style.display = 'none';
+      previewVideoEl.style.display = 'none';
+      mediaPreviewBox.style.display = 'none';
+      checkEligibility();
+    }
+
+    // ==========================================
+    // 3. LINK MODAL
+    // ==========================================
+    function openLinkModal() {
+      document.getElementById('linkInputValue').value = '';
+      document.getElementById('linkModalOverlay').style.display = 'flex';
+      setTimeout(() => document.getElementById('linkInputValue').focus(), 100);
+    }
+
+    function closeLinkModal() {
+      document.getElementById('linkModalOverlay').style.display = 'none';
+    }
+
+    function confirmInsertLink() {
+      const url = document.getElementById('linkInputValue').value.trim();
+      if (url) {
+        replyInput.focus();
+        replyInput.value += (replyInput.value ? " " : "") + url;
+        checkEligibility();
+      }
+      closeLinkModal();
+    }
+
+    // Insert # and @
+    function insertText(char) {
+      replyInput.focus();
+      const start = replyInput.selectionStart || replyInput.value.length;
+      const end = replyInput.selectionEnd || replyInput.value.length;
+      const val = replyInput.value;
+      replyInput.value = val.substring(0, start) + char + val.substring(end);
+      replyInput.selectionStart = replyInput.selectionEnd = start + 1;
+      replyInput.dispatchEvent(new Event('input'));
+    }
+
+    // ==========================================
+    // 4. SUBMIT REPLY ACTION
+    // ==========================================
+    function submitReply() {
+      const text = replyInput.value.trim();
+      if (!text && !attachedPhotoData && !attachedVideoData) return;
+
+      replyBtn.innerText = 'Posting...';
+      replyBtn.style.opacity = '0.6';
+
+      // Smooth return to feed
+      setTimeout(() => {
+        goBack();
+      }, 400);
+    }
+
+    // Mobile Keyboard Resize Support
+    if (window.visualViewport) {
+      const handleResize = () => {
+        const viewportHeight = window.visualViewport.height;
+        document.getElementById('appScreen').style.height = `${viewportHeight}px`;
+      };
+      window.visualViewport.addEventListener('resize', handleResize);
+      window.visualViewport.addEventListener('scroll', handleResize);
+    }
+  </script>
+
+</body>
+</html>

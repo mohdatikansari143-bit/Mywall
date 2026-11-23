@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Task Hub</title>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* Full Black Reset */
+    html, body {
+      background-color: #000000 !important;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      overscroll-behavior-y: none;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      background: #000000;
+      animation: pageFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Screen Wrapper */
+    .app-screen {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #000000;
+      padding: 20px 18px 120px 18px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Top Bar */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 20px;
+      background: #000000;
+    }
+
+    .header-title-wrap h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+    }
+
+    .header-title-wrap p {
+      margin: 3px 0 0 0;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #a855f7;
+    }
+
+    /* Week Strip */
+    .week-strip {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 22px;
+      width: 100%;
+    }
+    .week-day {
+      flex: 1;
+      min-width: 0;
+      height: 86px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0 12px;
+      color: #ffffff;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .week-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.55);
+    }
+    .week-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .week-date {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .week-day.today {
+      background: #ffffff;
+      border-color: #ffffff;
+      color: #000000;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 22px rgba(255, 255, 255, 0.25);
+    }
+    .week-day.today .week-dot { background: #000000; }
+    .week-day.today .week-name { color: #000000; }
+
+    /* 3 Tabs Row (Capsule Pill Style like Task Buttons) */
+    .tab-nav-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .tab-btn {
+      flex: 1;
+      height: 38px;
+      border-radius: 9999px;
+      background: #000000;
+      border: 1.8px solid rgba(255, 255, 255, 0.3);
+      color: #94a3b8;
+      font-family: 'Inter', sans-serif;
+      font-size: 11.5px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-align: center;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      outline: none;
+    }
+
+    .tab-btn:active {
+      transform: scale(0.95);
+      background: #141414;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
+    }
+
+    /* Content Sections */
+    .task-page-content {
+      display: none;
+      flex-direction: column;
+      gap: 0px;
+      animation: fadeIn 0.22s ease-in-out;
+    }
+
+    .task-page-content.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* NO BOX: CLEAN ROW FORMAT ON BLACK SCREEN */
+    .task-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 2px;
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-radius: 0 !important;
+    }
+
+    .task-row:last-child {
+      border-bottom: none !important;
+    }
+
+    .task-left {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .task-symbol-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .task-symbol-box svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .task-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow: hidden;
+    }
+
+    .task-name {
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-reward-tag {
+      font-size: 13px;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .task-reward-tag span {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 900;
+    }
+
+    /* WITHDRAW STYLE CAPSULE PILL BUTTONS */
+    .btn-task-start,
+    .btn-task-join {
+      min-width: 90px;
+      height: 38px;
+      background: #000000;
+      color: #ffffff;
+      border: 1.8px solid #ffffff;
+      border-radius: 9999px;
+      padding: 0 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      outline: none;
+    }
+
+    .btn-task-start:active,
+    .btn-task-join:active {
+      transform: scale(0.95);
+      background: #141414;
+      border-color: rgba(255, 255, 255, 0.75);
+    }
+
+    /* Completed Checkmark Capsule Pill */
+    .check-completed-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #000000;
+      border: 1.8px solid #22c55e;
+      color: #22c55e;
+      border-radius: 9999px;
+      height: 38px;
+      padding: 0 16px;
+      font-size: 11.5px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
+      animation: checkPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+    }
+
+    .check-completed-pill svg {
+      width: 15px;
+      height: 15px;
+      stroke: #22c55e;
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    @keyframes checkPop {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Toast Notification */
+    .toast-pill {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(18, 18, 22, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    .toast-pill.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* MATCHED BOTTOM NAVIGATION BAR */
+    .bottom-nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 74px;
+      background: #000000;
+      border-top: 1px solid #1c1c1c;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 8px;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      color: #777777;
+      cursor: pointer;
+      width: 64px;
+      padding: 6px 0;
+      position: relative;
+      transition: color 0.15s, transform 0.15s;
+    }
+
+    .nav-item:active {
+      transform: scale(0.92);
+    }
+
+    .nav-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+    }
+
+    .nav-item svg {
+      width: 26px;
+      height: 26px;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item span {
+      font-size: 11px;
+      font-weight: 800;
+      color: inherit;
+      letter-spacing: -0.1px;
+    }
+
+    .nav-item.active {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-screen">
+
+    <!-- Top Header -->
+    <div class="top-header">
+      <div class="header-title-wrap">
+        <h1>Task Hub</h1>
+        <p>Complete challenges & claim TR</p>
+      </div>
+    </div>
+
+    <!-- WEEK STRIP (Real-time Mon-Sun) -->
+    <div class="week-strip" id="weekStrip"></div>
+
+    <!-- 3 TABS (Capsule Pill Style) -->
+    <div class="tab-nav-row">
+      <button class="tab-btn active" id="tabDailyBtn" onclick="switchPage('daily')">Daily Reward</button>
+      <button class="tab-btn" id="tabWeeklyBtn" onclick="switchPage('weekly')">Weakly Reward</button>
+      <button class="tab-btn" id="tabChannelsBtn" onclick="switchPage('channels')">Channels</button>
+    </div>
+
+    <!-- PAGE 1: DAILY REWARD -->
+    <div class="task-page-content active" id="pageDaily">
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box" style="background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.35);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name" id="adsTitleText">Watch 4 Ads</span>
+            <div class="task-reward-tag">Earn <span>+100 TR</span></div>
+          </div>
+        </div>
+        <div id="adTaskActionWrap">
+          <button class="btn-task-start" onclick="progressAdTask()">START (0/4)</button>
+        </div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">Daily Miner Check-In</span>
+            <div class="task-reward-tag">Earn <span>+25 TR</span></div>
+          </div>
+        </div>
+        <div id="checkinTaskWrap">
+          <button class="btn-task-start" onclick="completeStandardTask('checkinTaskWrap', 25, 'Daily Check-In')">START</button>
+        </div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">Run Node 10 Minutes</span>
+            <div class="task-reward-tag">Earn <span>+40 TR</span></div>
+          </div>
+        </div>
+        <div id="nodeTaskWrap">
+          <button class="btn-task-start" onclick="completeStandardTask('nodeTaskWrap', 40, 'Node Boost')">START</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: WEAKLY REWARD -->
+    <div class="task-page-content" id="pageWeekly">
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box" style="background: rgba(234, 179, 8, 0.12); border-color: rgba(234, 179, 8, 0.35);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">Invite 3 Active Miners</span>
+            <div class="task-reward-tag" style="color: #eab308;">Earn <span>+300 TR</span></div>
+          </div>
+        </div>
+        <div id="weeklyInviteWrap">
+          <button class="btn-task-start" onclick="completeStandardTask('weeklyInviteWrap', 300, 'Invite 3 Miners')">START</button>
+        </div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">Mine 1,000 Hashes</span>
+            <div class="task-reward-tag" style="color: #eab308;">Earn <span>+500 TR</span></div>
+          </div>
+        </div>
+        <div id="weeklyHashWrap">
+          <button class="btn-task-start" onclick="completeStandardTask('weeklyHashWrap', 500, 'Mine 1,000 Hashes')">START</button>
+        </div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">7-Day Miner Streak</span>
+            <div class="task-reward-tag" style="color: #eab308;">Earn <span>+1,000 TR</span></div>
+          </div>
+        </div>
+        <div id="weeklyStreakWrap">
+          <button class="btn-task-start" onclick="completeStandardTask('weeklyStreakWrap', 1000, '7-Day Streak')">START</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 3: CHANNELS -->
+    <div class="task-page-content" id="pageChannels">
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box" style="background: rgba(34, 158, 217, 0.15); border-color: rgba(34, 158, 217, 0.4);">
+            <svg viewBox="0 0 24 24">
+              <path fill="#229ED9" d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.5 8.1l-2 9.5c-.2.7-.6.9-1.2.6l-3.1-2.3-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.1 5.6-5.1c.2-.2 0-.4-.3-.2L7.6 13.6 4.6 12.7c-.7-.2-.7-.7.1-1l11.7-4.5c.5-.2 1 .1.8.9z"/>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">Join Telegram Channel</span>
+            <div class="task-reward-tag" style="color: #c084fc;">Earn <span>+80 TR</span></div>
+          </div>
+        </div>
+        <div id="channelTelegramWrap">
+          <button class="btn-task-join" onclick="completeChannelTask('channelTelegramWrap', 80, 'Telegram Joined')">JOIN</button>
+        </div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box" style="background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2);">
+            <svg viewBox="0 0 24 24">
+              <path fill="#ffffff" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">Follow on Twitter / X</span>
+            <div class="task-reward-tag" style="color: #c084fc;">Earn <span>+80 TR</span></div>
+          </div>
+        </div>
+        <div id="channelTwitterWrap">
+          <button class="btn-task-join" onclick="completeChannelTask('channelTwitterWrap', 80, 'Twitter Joined')">JOIN</button>
+        </div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-symbol-box" style="background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4);">
+            <svg viewBox="0 0 24 24">
+              <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </div>
+          <div class="task-meta">
+            <span class="task-name">Subscribe YouTube</span>
+            <div class="task-reward-tag" style="color: #c084fc;">Earn <span>+100 TR</span></div>
+          </div>
+        </div>
+        <div id="channelYoutubeWrap">
+          <button class="btn-task-join" onclick="completeChannelTask('channelYoutubeWrap', 100, 'YouTube Subscribed')">JOIN</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATCHED BOTTOM NAVIGATION BAR (BULLETPROOF ROOT NAVIGATION) -->
+    <div class="bottom-nav-bar">
+      <!-- 1. Home -->
+      <button class="nav-item" onclick="navTo('/index.html')">
+        <div class="nav-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.3">
+            <path d="M3 10.2L12 3.5l9 6.7V20a1 1 0 0 1-1 1h-5v-6a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v6H4a1 1 0 0 1-1-1v-9.8z"/>
+          </svg>
+        </div>
+        <span>Home</span>
+      </button>
+
+      <!-- 2. Games -->
+      <button class="nav-item" onclick="navTo('/Games/Games.html')">
+        <div class="nav-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
+            <rect x="2" y="6" width="20" height="12" rx="4"></rect>
+            <line x1="6" y1="12" x2="10" y2="12"></line>
+            <line x1="8" y1="10" x2="8" y2="14"></line>
+            <line x1="15" y1="13" x2="15.01" y2="13"></line>
+            <line x1="18" y1="11" x2="18.01" y2="11"></line>
+          </svg>
+        </div>
+        <span>Games</span>
+      </button>
+
+      <!-- 3. Task (Active) -->
+      <button class="nav-item active">
+        <div class="nav-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </div>
+        <span>Task</span>
+      </button>
+
+      <!-- 4. Feed (Disabled / Coming Soon) -->
+      <button class="nav-item" onclick="showToast('Feed page coming soon!')">
+        <div class="nav-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
+            <path d="M4 11a9 9 0 0 1 9 9"></path>
+            <path d="M4 4a16 16 0 0 1 16 16"></path>
+            <circle cx="5" cy="19" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <span>Feed</span>
+      </button>
+
+      <!-- 5. Profile (UPDATED: Now directly redirects to Profile/profile.html) -->
+      <button class="nav-item" onclick="navTo('/Profile/profile.html')">
+        <div class="nav-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
+            <circle cx="12" cy="12" r="9.5"></circle>
+            <circle cx="12" cy="9.2" r="3.2"></circle>
+            <path d="M6.8 18.2a6 6 0 0 1 10.4 0"></path>
+          </svg>
+        </div>
+        <span>Profile</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-pill" id="toastPill"></div>
+
+  <script>
+    // ==========================================
+    // TELEGRAM INIT & EXPAND
+    // ==========================================
+    (function initTG() {
+      try {
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.ready();
+          window.Telegram.WebApp.expand();
+        }
+      } catch(e) {}
+    })();
+
+    // ==========================================
+    // BULLETPROOF ROOT NAVIGATION (YEHI HAI WO FUNCTION)
+    // ==========================================
+    function navTo(path) {
+      const clean = path.startsWith('/') ? path : '/' + path;
+      window.location.href = window.location.origin + clean;
+    }
+
+    // ============================================================
+    // AD LINK
+    // ============================================================
+    const AD_URL = 'https://example.com/your-ad-link';
+
+    function openAd() {
+      window.open(AD_URL, '_blank');
+    }
+
+    const toast = document.getElementById('toastPill');
+    let toastTimer = null;
+
+    function showToast(msg) {
+      if (!toast) return;
+      toast.innerText = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+
+    function loadBalance() {
+      let storedBalance = localStorage.getItem('trex_user_balance');
+      if (storedBalance === null) {
+        storedBalance = "2845.50";
+        localStorage.setItem('trex_user_balance', storedBalance);
+      }
+      return parseFloat(storedBalance);
+    }
+
+    function addBalance(amount, taskName) {
+      let current = loadBalance();
+      current += amount;
+      localStorage.setItem('trex_user_balance', current.toFixed(2));
+      showToast(`+${amount} TR Credited! (${taskName})`);
+    }
+
+    window.addEventListener('pageshow', loadBalance);
+    document.addEventListener('DOMContentLoaded', loadBalance);
+
+    const checkmarkHtml = `
+      <div class="check-completed-pill">
+        <svg viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        DONE
+      </div>
+    `;
+
+    function switchPage(pageKey) {
+      document.getElementById('tabDailyBtn').classList.toggle('active', pageKey === 'daily');
+      document.getElementById('tabWeeklyBtn').classList.toggle('active', pageKey === 'weekly');
+      document.getElementById('tabChannelsBtn').classList.toggle('active', pageKey === 'channels');
+
+      document.getElementById('pageDaily').classList.toggle('active', pageKey === 'daily');
+      document.getElementById('pageWeekly').classList.toggle('active', pageKey === 'weekly');
+      document.getElementById('pageChannels').classList.toggle('active', pageKey === 'channels');
+    }
+
+    // Watch 4 Ads Logic
+    let adsWatched = 0;
+    const adActionWrap = document.getElementById('adTaskActionWrap');
+    const adsTitle = document.getElementById('adsTitleText');
+
+    function progressAdTask() {
+      openAd();
+      adsWatched++;
+      if (adsWatched < 4) {
+        adActionWrap.innerHTML = `
+          <button class="btn-task-start" onclick="progressAdTask()">START (${adsWatched}/4)</button>
+        `;
+        showToast(`Ad ${adsWatched}/4 Watched!`);
+      } else {
+        adActionWrap.innerHTML = checkmarkHtml;
+        adsTitle.innerText = "Watch 4 Ads (Completed)";
+        addBalance(100, "4 Ads Reward");
+      }
+    }
+
+    function completeStandardTask(elementId, rewardAmount, taskName) {
+      openAd();
+      const container = document.getElementById(elementId);
+      container.innerHTML = `
+        <button class="btn-task-start" style="opacity: 0.7;">WORKING...</button>
+      `;
+      setTimeout(() => {
+        container.innerHTML = checkmarkHtml;
+        addBalance(rewardAmount, taskName);
+      }, 700);
+    }
+
+    function completeChannelTask(elementId, rewardAmount, channelName) {
+      openAd();
+      const container = document.getElementById(elementId);
+      container.innerHTML = `
+        <button class="btn-task-join" style="opacity: 0.7;">JOINING...</button>
+      `;
+      setTimeout(() => {
+        container.innerHTML = checkmarkHtml;
+        addBalance(rewardAmount, channelName);
+      }, 800);
+    }
+
+    // ===== Real-time Week Strip (Mon - Sun) =====
+    function renderWeekStrip() {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const offset = (today.getDay() + 6) % 7;
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - offset);
+
+      const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      let html = '';
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const isToday = d.getTime() === today.getTime();
+        html += `
+          <div class="week-day ${isToday ? 'today' : ''}">
+            <div class="week-dot"></div>
+            <div class="week-name">${names[i]}</div>
+            <div class="week-date">${d.getDate()}</div>
+          </div>`;
+      }
+      document.getElementById('weekStrip').innerHTML = html;
+    }
+
+    function scheduleMidnightUpdate() {
+      const now = new Date();
+      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+      setTimeout(() => {
+        renderWeekStrip();
+        scheduleMidnightUpdate();
+      }, next - now);
+    }
+
+    renderWeekStrip();
+    scheduleMidnightUpdate();
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) renderWeekStrip();
+    });
+    window.addEventListener('pageshow', renderWeekStrip);
+  </script>
+
+</body>
+        </html>

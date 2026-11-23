@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Withdrawal History</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&family=JetBrains+Mono:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* Full Dark Pitch-Black Reset */
+    html, body {
+      background-color: #000000 !important;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', Roboto, sans-serif;
+      font-weight: 800;
+      overscroll-behavior-y: none;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      font-family: inherit;
+      font-weight: 800;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      background: #000000;
+    }
+
+    /* Screen Wrapper */
+    .app-screen {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #000000;
+      padding: 16px 18px 44px 18px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================
+       TOP NAVIGATION BAR
+       ========================================== */
+    .top-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Liquid Glass Back Button */
+    .liquid-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.6),
+        0 8px 24px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      padding: 0;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .liquid-btn:active {
+      transform: scale(0.92);
+    }
+
+    .liquid-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .header-title-text {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+    }
+
+    /* ==========================================
+       IMAGE-INSPIRED PILL CAPSULE BUTTONS
+       ========================================== */
+    .status-tab-strip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 22px;
+      width: 100%;
+    }
+
+    .status-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 10px;
+      border-radius: 9999px; /* Stadium Pill shape */
+      font-size: 11.5px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      background: #000000;
+      border: 2px solid rgba(255, 255, 255, 0.35); /* Subtle outline */
+      color: #8e8e93;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+    }
+
+    .status-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Active State */
+    .status-btn.active {
+      background: #000000;
+      border: 2.2px solid #ffffff;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+    }
+
+    /* ==========================================
+       SWIPE SLIDER VIEWPORT & TRACK
+       ========================================== */
+    .slider-viewport {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      touch-action: pan-y;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    .slider-track {
+      display: flex;
+      width: 300%; /* 3 Pages: Complete (0), Incomplete (1), Pending (2) */
+      transform: translateX(0%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+      will-change: transform;
+    }
+
+    .slide-page {
+      width: 33.333333%;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================
+       OPEN CLEAN HISTORY LIST
+       ========================================== */
+    .cards-feed-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .withdraw-item-entry {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 18px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .withdraw-item-entry:last-child {
+      border-bottom: none;
+    }
+
+    /* Top Row: Withdraw Pill + Live Status */
+    .item-top-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Withdraw Badge: EXACT SAME STADIUM PILL */
+    .action-badge-pill {
+      font-size: 11px;
+      font-weight: 900;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      background: #000000;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Live Status Indicators */
+    .live-status-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 800;
+    }
+
+    .live-status-group.completed { color: #34d399; }
+    .live-status-group.pending   { color: #ffffff; }
+    .live-status-group.incomplete { color: #f87171; }
+
+    .pulse-dot-radar {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .live-status-group.completed .pulse-dot-radar { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+    .live-status-group.pending .pulse-dot-radar   { background: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
+    .live-status-group.incomplete .pulse-dot-radar { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+    /* Structured Key-Value Body */
+    .receipt-data-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .receipt-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .key-label {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #64748b;
+      flex-shrink: 0;
+    }
+
+    /* Pure White Balance */
+    .balance-amount-white {
+      font-size: 19px;
+      font-weight: 900;
+      color: #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -0.3px;
+    }
+
+    .value-highlight-white {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      text-align: right;
+    }
+
+    .value-exact-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 800;
+      color: #cbd5e1;
+    }
+
+    /* Order Number with 1-Tap Copy */
+    .txid-copyable-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: text;
+    }
+
+    .txid-code-string {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #38bdf8;
+      word-break: break-all;
+      text-align: right;
+      letter-spacing: -0.2px;
+    }
+
+    .copy-chip-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .txid-copyable-pill:active .copy-chip-icon {
+      background: #38bdf8;
+      color: #000000;
+      transform: scale(0.9);
+    }
+
+    .copy-chip-icon svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+    }
+
+    .remarks-text {
+      font-size: 12px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-align: right;
+    }
+
+    /* Empty State */
+    .empty-state-box {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 70px 10px;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .empty-state-box svg {
+      width: 34px;
+      height: 34px;
+      stroke: #52525b;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .empty-state-box span {
+      font-size: 14px;
+      font-weight: 800;
+      color: #71717a;
+    }
+
+    /* Toast Notification */
+    .toast-pill {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(22, 23, 28, 0.96);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      padding: 11px 22px;
+      border-radius: 100px;
+      font-size: 12.5px;
+      font-weight: 900;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 200;
+    }
+
+    .toast-pill.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-screen">
+
+    <!-- Top Navigation Header -->
+    <div class="top-header">
+      <div class="nav-left">
+        <button class="liquid-btn" onclick="window.history.back()" title="Back">
+          <svg viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <span class="header-title-text">Withdrawal history</span>
+      </div>
+    </div>
+
+    <!-- Stadium Pill Tabs -->
+    <div class="status-tab-strip" id="statusTabStrip">
+      <button class="status-btn active" data-index="0">
+        <span>Complete</span>
+      </button>
+
+      <button class="status-btn" data-index="1">
+        <span>Incomplete</span>
+      </button>
+
+      <button class="status-btn" data-index="2">
+        <span>Pending</span>
+      </button>
+    </div>
+
+    <!-- Swipe Viewport for Horizontal Slide -->
+    <div class="slider-viewport" id="sliderViewport">
+      <div class="slider-track" id="sliderTrack">
+
+        <!-- Page 0: Complete -->
+        <div class="slide-page" id="page-completed"></div>
+
+        <!-- Page 1: Incomplete -->
+        <div class="slide-page" id="page-incomplete"></div>
+
+        <!-- Page 2: Pending -->
+        <div class="slide-page" id="page-pending"></div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-pill" id="toastPill">Order number copied!</div>
+
+  <script>
+    // Authentic TRX Withdrawal Records Data
+    const records = [
+      {
+        id: "rec-1",
+        actionBadge: "Withdraw",
+        status: "completed",
+        statusTitle: "Completed",
+        balanceFormatted: "15,840.00 TRX",
+        typeText: "TRX Coins",
+        exactTimestamp: "2026-11-07 15:49:02",
+        orderNumber: "WD2026110715490216112196a",
+        remarks: "TRON Mainnet Verified"
+      },
+      {
+        id: "rec-2",
+        actionBadge: "Withdraw",
+        status: "completed",
+        statusTitle: "Completed",
+        balanceFormatted: "6,750.00 TRX",
+        typeText: "TRX Coins",
+        exactTimestamp: "2026-11-06 12:27:14",
+        orderNumber: "WD2026110612271466984127a",
+        remarks: "Instant Node Broadcasted"
+      },
+      {
+        id: "rec-3",
+        actionBadge: "Withdraw",
+        status: "completed",
+        statusTitle: "Completed",
+        balanceFormatted: "2,800.00 TRX",
+        typeText: "TRX Coins",
+        exactTimestamp: "2026-11-05 18:30:10",
+        orderNumber: "WD2026110518301099284112b",
+        remarks: "Network Settlement Complete"
+      },
+      {
+        id: "rec-4",
+        actionBadge: "Withdraw",
+        status: "pending",
+        statusTitle: "Pending",
+        balanceFormatted: "1,500.00 TRX",
+        typeText: "TRX Coins",
+        exactTimestamp: "2026-11-07 17:10:45",
+        orderNumber: "WD2026110717104588294011c",
+        remarks: "Node Confirmation Queue (12/19)"
+      },
+      {
+        id: "rec-5",
+        actionBadge: "Withdraw",
+        status: "incomplete",
+        statusTitle: "Incomplete",
+        balanceFormatted: "720.00 TRX",
+        typeText: "TRX Coins",
+        exactTimestamp: "2026-11-02 09:15:30",
+        orderNumber: "WD2026110209153000019284d",
+        remarks: "Network Energy Limit (Returned)"
+      }
+    ];
+
+    const tabKeys = ["completed", "incomplete", "pending"];
+    let currentTabIndex = 0;
+    const statusButtons = document.querySelectorAll(".status-btn");
+    const sliderTrack = document.getElementById("sliderTrack");
+    const sliderViewport = document.getElementById("sliderViewport");
+    const toast = document.getElementById("toastPill");
+
+    // Generate Item Entry HTML
+    function generateItemHTML(r) {
+      return `
+        <div class="withdraw-item-entry">
+          <!-- Top Row: Withdraw Pill Badge + Status -->
+          <div class="item-top-head">
+            <span class="action-badge-pill">${r.actionBadge}</span>
+            <div class="live-status-group ${r.status}">
+              <span class="pulse-dot-radar"></span>
+              <span>${r.statusTitle}</span>
+            </div>
+          </div>
+
+          <!-- Structured Details -->
+          <div class="receipt-data-rows">
+            <!-- Pure White Balance (TRX) -->
+            <div class="receipt-item-row">
+              <span class="key-label">Balance</span>
+              <div class="balance-amount-white">${r.balanceFormatted}</div>
+            </div>
+
+            <!-- Type: TRX Coins -->
+            <div class="receipt-item-row">
+              <span class="key-label">Type</span>
+              <span class="value-highlight-white">${r.typeText}</span>
+            </div>
+
+            <!-- Time -->
+            <div class="receipt-item-row">
+              <span class="key-label">Time</span>
+              <span class="value-exact-time">${r.exactTimestamp}</span>
+            </div>
+
+            <!-- Order Number / TxID (100% Reliable Copy) -->
+            <div class="receipt-item-row">
+              <span class="key-label">Order number</span>
+              <div class="txid-copyable-pill" onclick="copyText('${r.orderNumber}', 'Order number')" title="Tap to copy">
+                <span class="txid-code-string">${r.orderNumber}</span>
+                <div class="copy-chip-icon">
+                  <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Remarks -->
+            <div class="receipt-item-row">
+              <span class="key-label">Remarks</span>
+              <span class="remarks-text">${r.remarks}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render All Slide Pages
+    function renderAllPages() {
+      tabKeys.forEach(statusKey => {
+        const pageEl = document.getElementById("page-" + statusKey);
+        const filtered = records.filter(r => r.status === statusKey);
+
+        if (filtered.length === 0) {
+          pageEl.innerHTML = `
+            <div class="empty-state-box" style="display:flex;">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
+              <span>No withdrawal records found</span>
+            </div>
+          `;
+        } else {
+          pageEl.innerHTML = `<div class="cards-feed-wrap">` + filtered.map(generateItemHTML).join('') + `</div>`;
+        }
+      });
+    }
+
+    // Go to Specific Tab with Horizontal Slide
+    function goToTab(index) {
+      if (index < 0 || index >= tabKeys.length) return;
+      currentTabIndex = index;
+
+      // Smooth horizontal slide
+      sliderTrack.style.transform = `translateX(-${currentTabIndex * (100 / tabKeys.length)}%)`;
+
+      // Update active tab buttons
+      statusButtons.forEach((btn, idx) => {
+        if (idx === currentTabIndex) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
+    // Tab buttons click to slide
+    statusButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetIndex = parseInt(btn.getAttribute("data-index"), 10);
+        goToTab(targetIndex);
+      });
+    });
+
+    // Touch Swipe Detection (Left & Right Slide)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+
+    sliderViewport.addEventListener("touchstart", (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isSwiping = true;
+    }, { passive: true });
+
+    sliderViewport.addEventListener("touchend", (e) => {
+      if (!isSwiping) return;
+      isSwiping = false;
+
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffX = touchStartX - touchEndX;
+      const diffY = touchStartY - touchEndY;
+
+      // Check if horizontal swipe is dominant (threshold 45px)
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 45) {
+        if (diffX > 0) {
+          // Swipe Left -> Next Tab (Complete -> Incomplete -> Pending)
+          goToTab(currentTabIndex + 1);
+        } else {
+          // Swipe Right -> Prev Tab (Pending -> Incomplete -> Complete)
+          goToTab(currentTabIndex - 1);
+        }
+      }
+    }, { passive: true });
+
+    // Bulletproof 100% Guaranteed Copy
+    function copyText(str, label) {
+      if (navigator.vibrate) navigator.vibrate(25);
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(str).then(() => {
+          showToast(`${label} copied!`);
+        }).catch(() => {
+          fallbackClipboardCopy(str, label);
+        });
+      } else {
+        fallbackClipboardCopy(str, label);
+      }
+    }
+
+    function fallbackClipboardCopy(text, label) {
+      try {
+        const tempInput = document.createElement("textarea");
+        tempInput.value = text;
+        tempInput.style.position = "fixed";
+        tempInput.style.left = "-9999px";
+        tempInput.style.top = "0";
+        tempInput.setAttribute("readonly", "");
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999);
+        const copied = document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        if (copied) {
+          showToast(`${label} copied!`);
+        } else {
+          showToast(`Copied: ${text}`);
+        }
+      } catch (e) {
+        showToast(`Copied: ${text}`);
+      }
+    }
+
+    function showToast(text) {
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // Initial Load
+    renderAllPages();
+  </script>
+
+</body>
+</html>

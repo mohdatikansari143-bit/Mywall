@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Trexwallet</string>
+    <string name="loading_app">Loading Trexwallet...</string>
+    <string name="error_title">Unable to load page</string>
+    <string name="retry">Retry</string>
+    <string name="logo_content_description">Trexwallet Logo</string>
+</resources>
